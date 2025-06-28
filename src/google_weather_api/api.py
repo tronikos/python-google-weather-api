@@ -34,8 +34,6 @@ class GoogleWeatherApi:
         self,
         session: aiohttp.ClientSession,
         api_key: str,
-        latitude: float,
-        longitude: float,
         language_code: str = "en",
         units_system: str = "METRIC",
         referrer: str | None = None,
@@ -44,8 +42,6 @@ class GoogleWeatherApi:
         """Initialize the Google Weather API client."""
         self.session = session
         self.api_key = api_key
-        self.latitude = latitude
-        self.longitude = longitude
         self.language_code = language_code
         self.units_system = units_system
         self.referrer = referrer
@@ -62,8 +58,6 @@ class GoogleWeatherApi:
             "key": self.api_key,
             "language_code": self.language_code,
             "units_system": self.units_system,
-            "location.latitude": self.latitude,
-            "location.longitude": self.longitude,
         }
         _LOGGER.debug("GET %s with params: %s", url, params)
         try:
@@ -78,33 +72,46 @@ class GoogleWeatherApi:
                 if resp.status != HTTPStatus.OK:
                     raise GoogleWeatherApiResponseError(res["error"]["message"])
                 return res
-        except (aiohttp.ClientError, TimeoutError) as err:
-            raise GoogleWeatherApiConnectionError(
-                f"Error connecting to API: {err}"
-            ) from err
+        except TimeoutError as err:
+            raise GoogleWeatherApiConnectionError("Timeout") from err
+        except aiohttp.ClientError as err:
+            raise GoogleWeatherApiConnectionError(err) from err
 
-    async def async_get_current_conditions(self) -> dict[str, Any]:
+    async def async_get_current_conditions(
+        self, latitude: float, longitude: float
+    ) -> dict[str, Any]:
         """Fetch current weather conditions."""
         return await self._async_get(
             "currentConditions:lookup",
-            {},
+            {
+                "location.latitude": latitude,
+                "location.longitude": longitude,
+            },
         )
 
-    async def async_get_hourly_forecast(self, hours: int = 48) -> dict[str, Any]:
+    async def async_get_hourly_forecast(
+        self, latitude: float, longitude: float, hours: int = 48
+    ) -> dict[str, Any]:
         """Fetch hourly weather forecast."""
         return await self._async_get(
             "forecast/hours:lookup",
             {
+                "location.latitude": latitude,
+                "location.longitude": longitude,
                 "hours": hours,
                 "page_size": hours,
             },
         )
 
-    async def async_get_daily_forecast(self, days: int = 10) -> dict[str, Any]:
+    async def async_get_daily_forecast(
+        self, latitude: float, longitude: float, days: int = 10
+    ) -> dict[str, Any]:
         """Fetch daily weather forecast."""
         return await self._async_get(
             "forecast/days:lookup",
             {
+                "location.latitude": latitude,
+                "location.longitude": longitude,
                 "days": days,
                 "page_size": days,
             },
