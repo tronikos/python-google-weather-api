@@ -8,18 +8,15 @@ from typing import Any
 
 import aiohttp
 
-
-class GoogleWeatherApiError(Exception):
-    """Exception talking to the Google Weather API."""
-
-
-class GoogleWeatherApiConnectionError(GoogleWeatherApiError):
-    """Exception connecting to the Google Weather API."""
-
-
-class GoogleWeatherApiResponseError(GoogleWeatherApiError):
-    """Exception raised for errors in the Google Weather API response."""
-
+from .exceptions import (
+    GoogleWeatherApiConnectionError,
+    GoogleWeatherApiResponseError,
+)
+from .model import (
+    CurrentConditionsResponse,
+    DailyForecastResponse,
+    HourlyForecastResponse,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -79,21 +76,28 @@ class GoogleWeatherApi:
 
     async def async_get_current_conditions(
         self, latitude: float, longitude: float
-    ) -> dict[str, Any]:
-        """Fetch current weather conditions."""
-        return await self._async_get(
+    ) -> CurrentConditionsResponse:
+        """Fetch current weather conditions.
+
+        See https://developers.google.com/maps/documentation/weather/reference/rest/v1/currentConditions/lookup
+        """
+        data = await self._async_get(
             "currentConditions:lookup",
             {
                 "location.latitude": latitude,
                 "location.longitude": longitude,
             },
         )
+        return CurrentConditionsResponse.from_dict(data)
 
     async def async_get_hourly_forecast(
         self, latitude: float, longitude: float, hours: int = 48
-    ) -> dict[str, Any]:
-        """Fetch hourly weather forecast."""
-        return await self._async_get(
+    ) -> HourlyForecastResponse:
+        """Fetch hourly weather forecast.
+
+        See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.hours/lookup
+        """
+        data = await self._async_get(
             "forecast/hours:lookup",
             {
                 "location.latitude": latitude,
@@ -102,12 +106,16 @@ class GoogleWeatherApi:
                 "page_size": hours,
             },
         )
+        return HourlyForecastResponse.from_dict(data)
 
     async def async_get_daily_forecast(
         self, latitude: float, longitude: float, days: int = 10
-    ) -> dict[str, Any]:
-        """Fetch daily weather forecast."""
-        return await self._async_get(
+    ) -> DailyForecastResponse:
+        """Fetch daily weather forecast.
+
+        See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.days/lookup
+        """
+        data = await self._async_get(
             "forecast/days:lookup",
             {
                 "location.latitude": latitude,
@@ -116,3 +124,4 @@ class GoogleWeatherApi:
                 "page_size": days,
             },
         )
+        return DailyForecastResponse.from_dict(data)

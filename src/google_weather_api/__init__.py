@@ -1,15 +1,70 @@
 """A python client library for Google Weather API."""
 
-from .api import (
-    GoogleWeatherApi,
+from .api import GoogleWeatherApi
+from .exceptions import (
     GoogleWeatherApiConnectionError,
     GoogleWeatherApiError,
     GoogleWeatherApiResponseError,
 )
+from .model import (
+    AirPressure,
+    CurrentConditionsHistory,
+    CurrentConditionsResponse,
+    DailyForecastResponse,
+    Date,
+    DateTime,
+    ForecastDay,
+    ForecastDayPart,
+    ForecastHour,
+    HourlyForecastResponse,
+    IceThickness,
+    Interval,
+    LocalizedText,
+    MoonEvents,
+    Precipitation,
+    PrecipitationProbability,
+    QuantitativePrecipitationForecast,
+    SunEvents,
+    Temperature,
+    TimeZone,
+    Visibility,
+    WeatherCondition,
+    Wind,
+    WindDirection,
+    WindSpeed,
+)
 
 __all__ = [
+    # API
     "GoogleWeatherApi",
+    # Exceptions
     "GoogleWeatherApiConnectionError",
     "GoogleWeatherApiError",
     "GoogleWeatherApiResponseError",
+    # Models
+    "AirPressure",
+    "CurrentConditionsHistory",
+    "CurrentConditionsResponse",
+    "Date",
+    "DailyForecastResponse",
+    "DateTime",
+    "ForecastDay",
+    "ForecastDayPart",
+    "ForecastHour",
+    "HourlyForecastResponse",
+    "IceThickness",
+    "Interval",
+    "LocalizedText",
+    "MoonEvents",
+    "Precipitation",
+    "PrecipitationProbability",
+    "QuantitativePrecipitationForecast",
+    "SunEvents",
+    "Temperature",
+    "TimeZone",
+    "Visibility",
+    "WeatherCondition",
+    "Wind",
+    "WindDirection",
+    "WindSpeed",
 ]
