@@ -1,6 +1,6 @@
 [project]
 name = "python-google-weather-api"
-version = "0.0.3"
+version = "0.0.4"
 license = "Apache-2.0"
 authors = [
     { name="tronikos", email="tronikos@gmail.com" },

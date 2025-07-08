@@ -119,6 +119,11 @@ class Precipitation(DataClassJSONMixin):
     qpf: QuantitativePrecipitationForecast
     """The amount of precipitation (rain or snow), measured as liquid water."""
 
+    snow_qpf: QuantitativePrecipitationForecast | None = field(
+        default=None, metadata={"alias": "snowQpf"}
+    )
+    """The amount of snow accumulation, measured as liquid water equivalent."""
+
 
 @dataclass
 class WindSpeed(DataClassJSONMixin):
@@ -401,6 +406,11 @@ class ForecastDayPart(DataClassJSONMixin):
     cloud_cover: int = field(metadata={"alias": "cloudCover"})
     """Average cloud cover percent."""
 
+    ice_thickness: IceThickness | None = field(
+        default=None, metadata={"alias": "iceThickness"}
+    )
+    """The forecasted ice thickness."""
+
 
 @dataclass
 class SunEvents(DataClassJSONMixin):
@@ -430,14 +440,18 @@ class MoonEvents(DataClassJSONMixin):
         LAST_QUARTER = "LAST_QUARTER"
         WANING_CRESCENT = "WANING_CRESCENT"
 
-    moonrise_times: list[str] = field(metadata={"alias": "moonriseTimes"})
-    """The time(s) when the upper limb of the moon appears above the horizon."""
-
-    moonset_times: list[str] = field(metadata={"alias": "moonsetTimes"})
-    """The time(s) when the upper limb of the moon disappears below the horizon."""
-
     moon_phase: MoonPhase = field(metadata={"alias": "moonPhase"})
     """The moon phase (a.k.a. lunar phase)."""
+
+    moonrise_times: list[str] = field(
+        default_factory=list, metadata={"alias": "moonriseTimes"}
+    )
+    """The time(s) when the upper limb of the moon appears above the horizon."""
+
+    moonset_times: list[str] = field(
+        default_factory=list, metadata={"alias": "moonsetTimes"}
+    )
+    """The time(s) when the upper limb of the moon disappears below the horizon."""
 
 
 @dataclass
