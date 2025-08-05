@@ -119,9 +119,7 @@ class Precipitation(DataClassJSONMixin):
     qpf: QuantitativePrecipitationForecast
     """The amount of precipitation (rain or snow), measured as liquid water."""
 
-    snow_qpf: QuantitativePrecipitationForecast | None = field(
-        default=None, metadata={"alias": "snowQpf"}
-    )
+    snow_qpf: QuantitativePrecipitationForecast | None = field(default=None, metadata={"alias": "snowQpf"})
     """The amount of snow accumulation, measured as liquid water equivalent."""
 
 
@@ -317,9 +315,7 @@ class CurrentConditionsResponse(DataClassJSONMixin):
     temperature: Temperature
     """The current temperature."""
 
-    feels_like_temperature: Temperature = field(
-        metadata={"alias": "feelsLikeTemperature"}
-    )
+    feels_like_temperature: Temperature = field(metadata={"alias": "feelsLikeTemperature"})
     """The measure of how the temperature currently feels like."""
 
     dew_point: Temperature = field(metadata={"alias": "dewPoint"})
@@ -343,9 +339,7 @@ class CurrentConditionsResponse(DataClassJSONMixin):
     visibility: Visibility
     """The current visibility."""
 
-    current_conditions_history: CurrentConditionsHistory = field(
-        metadata={"alias": "currentConditionsHistory"}
-    )
+    current_conditions_history: CurrentConditionsHistory = field(metadata={"alias": "currentConditionsHistory"})
     """The changes in the current conditions over the last 24 hours."""
 
     is_daytime: bool = field(metadata={"alias": "isDaytime"})
@@ -406,9 +400,7 @@ class ForecastDayPart(DataClassJSONMixin):
     cloud_cover: int = field(metadata={"alias": "cloudCover"})
     """Average cloud cover percent."""
 
-    ice_thickness: IceThickness | None = field(
-        default=None, metadata={"alias": "iceThickness"}
-    )
+    ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The forecasted ice thickness."""
 
 
@@ -443,14 +435,10 @@ class MoonEvents(DataClassJSONMixin):
     moon_phase: MoonPhase = field(metadata={"alias": "moonPhase"})
     """The moon phase (a.k.a. lunar phase)."""
 
-    moonrise_times: list[str] = field(
-        default_factory=list, metadata={"alias": "moonriseTimes"}
-    )
+    moonrise_times: list[str] = field(default_factory=list, metadata={"alias": "moonriseTimes"})
     """The time(s) when the upper limb of the moon appears above the horizon."""
 
-    moonset_times: list[str] = field(
-        default_factory=list, metadata={"alias": "moonsetTimes"}
-    )
+    moonset_times: list[str] = field(default_factory=list, metadata={"alias": "moonsetTimes"})
     """The time(s) when the upper limb of the moon disappears below the horizon."""
 
 
@@ -476,14 +464,10 @@ class ForecastDay(DataClassJSONMixin):
     min_temperature: Temperature = field(metadata={"alias": "minTemperature"})
     """The minimum (low) temperature throughout the day."""
 
-    feels_like_max_temperature: Temperature = field(
-        metadata={"alias": "feelsLikeMaxTemperature"}
-    )
+    feels_like_max_temperature: Temperature = field(metadata={"alias": "feelsLikeMaxTemperature"})
     """The maximum (high) feels-like temperature throughout the day."""
 
-    feels_like_min_temperature: Temperature = field(
-        metadata={"alias": "feelsLikeMinTemperature"}
-    )
+    feels_like_min_temperature: Temperature = field(metadata={"alias": "feelsLikeMinTemperature"})
     """The minimum (low) feels-like temperature throughout the day."""
 
     max_heat_index: Temperature = field(metadata={"alias": "maxHeatIndex"})
@@ -495,9 +479,7 @@ class ForecastDay(DataClassJSONMixin):
     moon_events: MoonEvents = field(metadata={"alias": "moonEvents"})
     """The events related to the moon (e.g. moonrise, moonset)."""
 
-    ice_thickness: IceThickness | None = field(
-        default=None, metadata={"alias": "iceThickness"}
-    )
+    ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The accumulated amount of ice throughout the entire day."""
 
 
@@ -511,9 +493,7 @@ class DailyForecastResponse(DataClassJSONMixin):
     time_zone: TimeZone = field(metadata={"alias": "timeZone"})
     """The time zone at the requested location."""
 
-    next_page_token: str | None = field(
-        default=None, metadata={"alias": "nextPageToken"}
-    )
+    next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
     """The token to retrieve the next page."""
 
 
@@ -565,9 +545,7 @@ class ForecastHour(DataClassJSONMixin):
     temperature: Temperature
     """The forecasted temperature."""
 
-    feels_like_temperature: Temperature = field(
-        metadata={"alias": "feelsLikeTemperature"}
-    )
+    feels_like_temperature: Temperature = field(metadata={"alias": "feelsLikeTemperature"})
     """The measure of how the temperature will feel like."""
 
     dew_point: Temperature = field(metadata={"alias": "dewPoint"})
@@ -609,9 +587,7 @@ class ForecastHour(DataClassJSONMixin):
     cloud_cover: int = field(metadata={"alias": "cloudCover"})
     """The forecasted percentage of the sky covered by clouds (0-100)."""
 
-    ice_thickness: IceThickness | None = field(
-        default=None, metadata={"alias": "iceThickness"}
-    )
+    ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The forecasted ice thickness."""
 
 
@@ -625,7 +601,5 @@ class HourlyForecastResponse(DataClassJSONMixin):
     time_zone: TimeZone = field(metadata={"alias": "timeZone"})
     """The time zone at the requested location."""
 
-    next_page_token: str | None = field(
-        default=None, metadata={"alias": "nextPageToken"}
-    )
+    next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
     """The token to retrieve the next page."""

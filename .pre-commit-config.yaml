@@ -25,39 +25,21 @@ repos:
       - id: forbid-submodules
       - id: mixed-line-ending
       - id: trailing-whitespace
-  - repo: https://github.com/PyCQA/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
-    hooks:
-      - id: flake8
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.2
+    rev: v0.12.7
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.1
+    rev: v1.17.1
     hooks:
       - id: mypy
-        args: [--strict]
+        args: [--config-file=pyproject.toml]
         additional_dependencies:
-          [
-            aiohttp,
-            mashumaro,
-          ]
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
-    hooks:
-      - id: pyupgrade
-        args: [--py311-plus]
-  - repo: https://github.com/adrienverge/yamllint.git
+          - aiohttp
+          - mashumaro
+  - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
     hooks:
       - id: yamllint
@@ -65,6 +47,7 @@ repos:
     rev: v0.45.0
     hooks:
       - id: markdownlint
+        args: [--fix, --config, .markdownlint.yaml]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:

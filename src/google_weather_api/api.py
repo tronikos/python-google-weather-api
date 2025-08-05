@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from http import HTTPStatus
 import logging
+from http import HTTPStatus
 from typing import Any
 
 import aiohttp
@@ -74,9 +74,7 @@ class GoogleWeatherApi:
         except aiohttp.ClientError as err:
             raise GoogleWeatherApiConnectionError(err) from err
 
-    async def async_get_current_conditions(
-        self, latitude: float, longitude: float
-    ) -> CurrentConditionsResponse:
+    async def async_get_current_conditions(self, latitude: float, longitude: float) -> CurrentConditionsResponse:
         """Fetch current weather conditions.
 
         See https://developers.google.com/maps/documentation/weather/reference/rest/v1/currentConditions/lookup
@@ -90,9 +88,7 @@ class GoogleWeatherApi:
         )
         return CurrentConditionsResponse.from_dict(data)
 
-    async def async_get_hourly_forecast(
-        self, latitude: float, longitude: float, hours: int = 48
-    ) -> HourlyForecastResponse:
+    async def async_get_hourly_forecast(self, latitude: float, longitude: float, hours: int = 48) -> HourlyForecastResponse:
         """Fetch hourly weather forecast.
 
         See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.hours/lookup
@@ -108,9 +104,7 @@ class GoogleWeatherApi:
         )
         return HourlyForecastResponse.from_dict(data)
 
-    async def async_get_daily_forecast(
-        self, latitude: float, longitude: float, days: int = 10
-    ) -> DailyForecastResponse:
+    async def async_get_daily_forecast(self, latitude: float, longitude: float, days: int = 10) -> DailyForecastResponse:
         """Fetch daily weather forecast.
 
         See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.days/lookup
