@@ -9,5 +9,9 @@ class GoogleWeatherApiConnectionError(GoogleWeatherApiError):
     """Exception connecting to the Google Weather API."""
 
 
+class GoogleWeatherApiAuthError(GoogleWeatherApiError):
+    """Exception raised for authentication errors in the Google Weather API."""
+
+
 class GoogleWeatherApiResponseError(GoogleWeatherApiError):
     """Exception raised for errors in the Google Weather API response."""

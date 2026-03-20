@@ -9,6 +9,7 @@ from typing import Any
 import aiohttp
 
 from .exceptions import (
+    GoogleWeatherApiAuthError,
     GoogleWeatherApiConnectionError,
     GoogleWeatherApiResponseError,
 )
@@ -67,6 +68,8 @@ class GoogleWeatherApi:
                 res: dict[str, Any] = await resp.json()
                 _LOGGER.debug("Got %s for %s", resp.status, url)
                 if resp.status != HTTPStatus.OK:
+                    if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+                        raise GoogleWeatherApiAuthError(res["error"]["message"])
                     raise GoogleWeatherApiResponseError(res["error"]["message"])
                 return res
         except TimeoutError as err:

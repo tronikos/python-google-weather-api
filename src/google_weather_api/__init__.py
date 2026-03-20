@@ -2,6 +2,7 @@
 
 from .api import GoogleWeatherApi
 from .exceptions import (
+    GoogleWeatherApiAuthError,
     GoogleWeatherApiConnectionError,
     GoogleWeatherApiError,
     GoogleWeatherApiResponseError,
@@ -45,6 +46,7 @@ __all__ = [
     "ForecastDayPart",
     "ForecastHour",
     "GoogleWeatherApi",
+    "GoogleWeatherApiAuthError",
     "GoogleWeatherApiConnectionError",
     "GoogleWeatherApiError",
     "GoogleWeatherApiResponseError",
