@@ -68,9 +68,19 @@ class GoogleWeatherApi:
                 res: dict[str, Any] = await resp.json()
                 _LOGGER.debug("Got %s for %s", resp.status, url)
                 if resp.status != HTTPStatus.OK:
+                    error_data = res.get("error", {})
+                    error_msg = error_data.get("message", "Unknown API error")
+
                     if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
-                        raise GoogleWeatherApiAuthError(res["error"]["message"])
-                    raise GoogleWeatherApiResponseError(res["error"]["message"])
+                        raise GoogleWeatherApiAuthError(error_msg)
+
+                    # Google APIs often return 400 Bad Request for invalid API keys
+                    if resp.status == HTTPStatus.BAD_REQUEST:
+                        for detail in error_data.get("details", []):
+                            if detail.get("reason") == "API_KEY_INVALID":
+                                raise GoogleWeatherApiAuthError(error_msg)
+
+                    raise GoogleWeatherApiResponseError(error_msg)
                 return res
         except TimeoutError as err:
             raise GoogleWeatherApiConnectionError("Timeout") from err
