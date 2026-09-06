@@ -1,0 +1,192 @@
+{
+  "forecastHours": [
+    {
+      "interval": {
+        "startTime": "2026-09-06T18:00:00Z",
+        "endTime": "2026-09-06T19:00:00Z"
+      },
+      "displayDateTime": {
+        "year": 2026,
+        "month": 9,
+        "day": 6,
+        "hours": 11,
+        "minutes": 0,
+        "seconds": 0,
+        "nanos": 0,
+        "utcOffset": "-25200s"
+      },
+      "weatherCondition": {
+        "iconBaseUri": "https://maps.gstatic.com/weather/v1/sunny",
+        "description": {
+          "text": "Sunny",
+          "languageCode": "en"
+        },
+        "type": "CLEAR"
+      },
+      "temperature": {
+        "unit": "CELSIUS",
+        "degrees": 17.5
+      },
+      "feelsLikeTemperature": {
+        "unit": "CELSIUS",
+        "degrees": 17.5
+      },
+      "dewPoint": {
+        "unit": "CELSIUS",
+        "degrees": 12.4
+      },
+      "heatIndex": {
+        "unit": "CELSIUS",
+        "degrees": 17.5
+      },
+      "windChill": {
+        "unit": "CELSIUS",
+        "degrees": 17.5
+      },
+      "wetBulbTemperature": {
+        "unit": "CELSIUS",
+        "degrees": 14.4
+      },
+      "precipitation": {
+        "probability": {
+          "type": "RAIN",
+          "percent": 0
+        },
+        "snowQpf": {
+          "unit": "MILLIMETERS",
+          "quantity": 0
+        },
+        "qpf": {
+          "unit": "MILLIMETERS",
+          "quantity": 0
+        }
+      },
+      "airPressure": {
+        "meanSeaLevelMillibars": 1016.3
+      },
+      "wind": {
+        "direction": {
+          "cardinal": "NORTH",
+          "degrees": 5
+        },
+        "speed": {
+          "unit": "KILOMETERS_PER_HOUR",
+          "value": 8
+        },
+        "gust": {
+          "unit": "KILOMETERS_PER_HOUR",
+          "value": 16
+        }
+      },
+      "visibility": {
+        "unit": "KILOMETERS",
+        "distance": 16
+      },
+      "iceThickness": {
+        "unit": "MILLIMETERS",
+        "thickness": 0
+      },
+      "isDaytime": true,
+      "relativeHumidity": 71,
+      "uvIndex": 3,
+      "thunderstormProbability": 0,
+      "cloudCover": 16
+    },
+    {
+      "interval": {
+        "startTime": "2026-09-06T19:00:00Z",
+        "endTime": "2026-09-06T20:00:00Z"
+      },
+      "displayDateTime": {
+        "year": 2026,
+        "month": 9,
+        "day": 6,
+        "hours": 12,
+        "minutes": 0,
+        "seconds": 0,
+        "nanos": 0,
+        "utcOffset": "-25200s"
+      },
+      "weatherCondition": {
+        "iconBaseUri": "https://maps.gstatic.com/weather/v1/sunny",
+        "description": {
+          "text": "Sunny",
+          "languageCode": "en"
+        },
+        "type": "CLEAR"
+      },
+      "temperature": {
+        "unit": "CELSIUS",
+        "degrees": 18.5
+      },
+      "feelsLikeTemperature": {
+        "unit": "CELSIUS",
+        "degrees": 18.5
+      },
+      "dewPoint": {
+        "unit": "CELSIUS",
+        "degrees": 11.5
+      },
+      "heatIndex": {
+        "unit": "CELSIUS",
+        "degrees": 18.5
+      },
+      "windChill": {
+        "unit": "CELSIUS",
+        "degrees": 18.5
+      },
+      "wetBulbTemperature": {
+        "unit": "CELSIUS",
+        "degrees": 14.3
+      },
+      "precipitation": {
+        "probability": {
+          "type": "RAIN",
+          "percent": 0
+        },
+        "snowQpf": {
+          "unit": "MILLIMETERS",
+          "quantity": 0
+        },
+        "qpf": {
+          "unit": "MILLIMETERS",
+          "quantity": 0
+        }
+      },
+      "airPressure": {
+        "meanSeaLevelMillibars": 1016.02
+      },
+      "wind": {
+        "direction": {
+          "cardinal": "NORTH",
+          "degrees": 350
+        },
+        "speed": {
+          "unit": "KILOMETERS_PER_HOUR",
+          "value": 8
+        },
+        "gust": {
+          "unit": "KILOMETERS_PER_HOUR",
+          "value": 18
+        }
+      },
+      "visibility": {
+        "unit": "KILOMETERS",
+        "distance": 16
+      },
+      "iceThickness": {
+        "unit": "MILLIMETERS",
+        "thickness": 0
+      },
+      "isDaytime": true,
+      "relativeHumidity": 63,
+      "uvIndex": 5,
+      "thunderstormProbability": 0,
+      "cloudCover": 2
+    }
+  ],
+  "timeZone": {
+    "id": "America/Los_Angeles",
+    "version": ""
+  }
+}

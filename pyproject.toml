@@ -16,6 +16,8 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
 ]
 
 
@@ -26,6 +28,13 @@ test = [
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--cov=google_weather_api --cov-report=term-missing --cov-fail-under=90"
+
+[tool.coverage.run]
+branch = true
 
 [tool.ruff]
 target-version = "py311"
