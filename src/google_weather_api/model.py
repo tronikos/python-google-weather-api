@@ -6,6 +6,7 @@ import logging
 from dataclasses import dataclass, field
 from enum import StrEnum
 
+from mashumaro.config import BaseConfig
 from mashumaro.mixins.json import DataClassJSONMixin
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,8 +34,18 @@ class ApiStrEnum(StrEnum):
         return unspecified
 
 
+class BaseModel(DataClassJSONMixin):
+    """Base class for all models."""
+
+    class Config(BaseConfig):
+        """Serialize using the camelCase names the API uses, so models round-trip."""
+
+        serialize_by_alias = True
+        allow_deserialization_not_by_alias = True
+
+
 @dataclass
-class AirPressure(DataClassJSONMixin):
+class AirPressure(BaseModel):
     """Represents the atmospheric air pressure conditions."""
 
     mean_sea_level_millibars: float = field(metadata={"alias": "meanSeaLevelMillibars"})
@@ -42,7 +53,7 @@ class AirPressure(DataClassJSONMixin):
 
 
 @dataclass
-class Interval(DataClassJSONMixin):
+class Interval(BaseModel):
     """Represents a time interval."""
 
     start_time: str = field(metadata={"alias": "startTime"})
@@ -53,7 +64,7 @@ class Interval(DataClassJSONMixin):
 
 
 @dataclass
-class TimeZone(DataClassJSONMixin):
+class TimeZone(BaseModel):
     """Represents a time zone from the IANA Time Zone Database."""
 
     id: str
@@ -64,7 +75,7 @@ class TimeZone(DataClassJSONMixin):
 
 
 @dataclass
-class LocalizedText(DataClassJSONMixin):
+class LocalizedText(BaseModel):
     """Localized variant of a text in a particular language."""
 
     text: str
@@ -75,7 +86,7 @@ class LocalizedText(DataClassJSONMixin):
 
 
 @dataclass
-class Temperature(DataClassJSONMixin):
+class Temperature(BaseModel):
     """Represents a temperature value."""
 
     class TemperatureUnit(ApiStrEnum):
@@ -93,7 +104,7 @@ class Temperature(DataClassJSONMixin):
 
 
 @dataclass
-class QuantitativePrecipitationForecast(DataClassJSONMixin):
+class QuantitativePrecipitationForecast(BaseModel):
     """Represents the expected amount of melted precipitation."""
 
     class Unit(ApiStrEnum):
@@ -111,7 +122,7 @@ class QuantitativePrecipitationForecast(DataClassJSONMixin):
 
 
 @dataclass
-class PrecipitationProbability(DataClassJSONMixin):
+class PrecipitationProbability(BaseModel):
     """Represents the probability of precipitation at a given location."""
 
     class PrecipitationType(ApiStrEnum):
@@ -135,7 +146,7 @@ class PrecipitationProbability(DataClassJSONMixin):
 
 
 @dataclass
-class Precipitation(DataClassJSONMixin):
+class Precipitation(BaseModel):
     """Represents a set of precipitation values at a given location."""
 
     probability: PrecipitationProbability
@@ -149,7 +160,7 @@ class Precipitation(DataClassJSONMixin):
 
 
 @dataclass
-class WindSpeed(DataClassJSONMixin):
+class WindSpeed(BaseModel):
     """Represents the speed of the wind."""
 
     class SpeedUnit(ApiStrEnum):
@@ -167,7 +178,7 @@ class WindSpeed(DataClassJSONMixin):
 
 
 @dataclass
-class WindDirection(DataClassJSONMixin):
+class WindDirection(BaseModel):
     """Represents the direction from which the wind originates."""
 
     class CardinalDirection(ApiStrEnum):
@@ -199,7 +210,7 @@ class WindDirection(DataClassJSONMixin):
 
 
 @dataclass
-class Wind(DataClassJSONMixin):
+class Wind(BaseModel):
     """Represents a set of wind properties."""
 
     direction: WindDirection
@@ -213,7 +224,7 @@ class Wind(DataClassJSONMixin):
 
 
 @dataclass
-class Visibility(DataClassJSONMixin):
+class Visibility(BaseModel):
     """Represents visibility conditions, the distance at which objects can be discerned."""
 
     class Unit(ApiStrEnum):
@@ -231,7 +242,7 @@ class Visibility(DataClassJSONMixin):
 
 
 @dataclass
-class WeatherCondition(DataClassJSONMixin):
+class WeatherCondition(BaseModel):
     """Represents a weather condition for a given location at a given period of time."""
 
     class Type(ApiStrEnum):
@@ -290,7 +301,7 @@ class WeatherCondition(DataClassJSONMixin):
 
 
 @dataclass
-class IceThickness(DataClassJSONMixin):
+class IceThickness(BaseModel):
     """Represents ice thickness conditions."""
 
     class Unit(ApiStrEnum):
@@ -308,7 +319,7 @@ class IceThickness(DataClassJSONMixin):
 
 
 @dataclass
-class CurrentConditionsHistory(DataClassJSONMixin):
+class CurrentConditionsHistory(BaseModel):
     """Represents a set of changes in the current conditions over the last 24 hours."""
 
     temperature_change: Temperature = field(metadata={"alias": "temperatureChange"})
@@ -325,7 +336,7 @@ class CurrentConditionsHistory(DataClassJSONMixin):
 
 
 @dataclass
-class CurrentConditionsResponse(DataClassJSONMixin):
+class CurrentConditionsResponse(BaseModel):
     """Response model for the currentConditions.lookup method."""
 
     current_time: str = field(metadata={"alias": "currentTime"})
@@ -384,7 +395,7 @@ class CurrentConditionsResponse(DataClassJSONMixin):
 
 
 @dataclass
-class Date(DataClassJSONMixin):
+class Date(BaseModel):
     """Represents a whole or partial calendar date."""
 
     year: int
@@ -398,7 +409,7 @@ class Date(DataClassJSONMixin):
 
 
 @dataclass
-class ForecastDayPart(DataClassJSONMixin):
+class ForecastDayPart(BaseModel):
     """Represents a forecast record for a part of the day (daytime or nighttime)."""
 
     interval: Interval
@@ -430,7 +441,7 @@ class ForecastDayPart(DataClassJSONMixin):
 
 
 @dataclass
-class SunEvents(DataClassJSONMixin):
+class SunEvents(BaseModel):
     """Represents the events related to the sun (e.g. sunrise, sunset)."""
 
     sunrise_time: str | None = field(default=None, metadata={"alias": "sunriseTime"})
@@ -441,7 +452,7 @@ class SunEvents(DataClassJSONMixin):
 
 
 @dataclass
-class MoonEvents(DataClassJSONMixin):
+class MoonEvents(BaseModel):
     """Represents the events related to the moon (e.g. moonrise, moonset)."""
 
     class MoonPhase(ApiStrEnum):
@@ -468,7 +479,7 @@ class MoonEvents(DataClassJSONMixin):
 
 
 @dataclass
-class ForecastDay(DataClassJSONMixin):
+class ForecastDay(BaseModel):
     """Represents a daily forecast record at a given location."""
 
     interval: Interval
@@ -509,7 +520,7 @@ class ForecastDay(DataClassJSONMixin):
 
 
 @dataclass
-class DailyForecastResponse(DataClassJSONMixin):
+class DailyForecastResponse(BaseModel):
     """Response model for the forecast.days.lookup method."""
 
     forecast_days: list[ForecastDay] = field(metadata={"alias": "forecastDays"})
@@ -523,7 +534,7 @@ class DailyForecastResponse(DataClassJSONMixin):
 
 
 @dataclass
-class DateTime(DataClassJSONMixin):
+class DateTime(BaseModel):
     """Represents civil time (or occasionally physical time)."""
 
     year: int | None = None
@@ -555,7 +566,7 @@ class DateTime(DataClassJSONMixin):
 
 
 @dataclass
-class ForecastHour(DataClassJSONMixin):
+class ForecastHour(BaseModel):
     """Represents an hourly forecast record at a given location."""
 
     interval: Interval
@@ -617,7 +628,7 @@ class ForecastHour(DataClassJSONMixin):
 
 
 @dataclass
-class HourlyForecastResponse(DataClassJSONMixin):
+class HourlyForecastResponse(BaseModel):
     """Response model for the forecast.hours.lookup method."""
 
     forecast_hours: list[ForecastHour] = field(metadata={"alias": "forecastHours"})
