@@ -53,11 +53,12 @@ class GoogleWeatherApi:
             headers[aiohttp.hdrs.REFERER] = self.referrer
         params = {
             **params,
-            "key": self.api_key,
             "language_code": self.language_code,
             "units_system": self.units_system,
         }
+        # Log before adding the API key so it doesn't end up in debug logs.
         _LOGGER.debug("GET %s with params: %s", url, params)
+        params["key"] = self.api_key
         try:
             async with self.session.get(
                 url,
