@@ -88,6 +88,26 @@ class GoogleWeatherApi:
         except aiohttp.ClientError as err:
             raise GoogleWeatherApiConnectionError(err) from err
 
+    async def _async_get_all_pages(
+        self, endpoint: str, params: dict[str, Any], records_key: str, limit: int
+    ) -> dict[str, Any]:
+        """Perform a GET request, following pagination until `limit` records are collected.
+
+        The API caps the number of records it returns per page (24 for hourly forecasts),
+        regardless of the requested page size, so a single request is not enough.
+        """
+        params = {**params, "page_size": limit}
+        data = await self._async_get(endpoint, params)
+        records: list[Any] = data.get(records_key, [])
+        while len(records) < limit and (page_token := data.get("nextPageToken")):
+            data = await self._async_get(endpoint, {**params, "page_token": page_token})
+            page_records: list[Any] = data.get(records_key, [])
+            if not page_records:
+                break
+            records.extend(page_records)
+        data[records_key] = records[:limit]
+        return data
+
     async def async_get_current_conditions(self, latitude: float, longitude: float) -> CurrentConditionsResponse:
         """Fetch current weather conditions.
 
@@ -107,14 +127,15 @@ class GoogleWeatherApi:
 
         See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.hours/lookup
         """
-        data = await self._async_get(
+        data = await self._async_get_all_pages(
             "forecast/hours:lookup",
             {
                 "location.latitude": latitude,
                 "location.longitude": longitude,
                 "hours": hours,
-                "page_size": hours,
             },
+            "forecastHours",
+            hours,
         )
         return HourlyForecastResponse.from_dict(data)
 
@@ -123,13 +144,14 @@ class GoogleWeatherApi:
 
         See https://developers.google.com/maps/documentation/weather/reference/rest/v1/forecast.days/lookup
         """
-        data = await self._async_get(
+        data = await self._async_get_all_pages(
             "forecast/days:lookup",
             {
                 "location.latitude": latitude,
                 "location.longitude": longitude,
                 "days": days,
-                "page_size": days,
             },
+            "forecastDays",
+            days,
         )
         return DailyForecastResponse.from_dict(data)
