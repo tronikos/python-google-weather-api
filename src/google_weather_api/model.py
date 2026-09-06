@@ -2,10 +2,35 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from enum import StrEnum
 
 from mashumaro.mixins.json import DataClassJSONMixin
+
+_LOGGER = logging.getLogger(__name__)
+
+
+class ApiStrEnum(StrEnum):
+    """A StrEnum that tolerates values the API added after this library was released.
+
+    Google keeps adding values to these enums. Rather than failing to parse the whole
+    response, an unknown value falls back to the first member, which is by convention
+    the ``*_UNSPECIFIED`` one.
+    """
+
+    @classmethod
+    def _missing_(cls, value: object) -> ApiStrEnum:
+        """Fall back to the unspecified member for values not known to this library."""
+        unspecified = next(iter(cls))
+        _LOGGER.warning(
+            "Unknown %s value %r returned by the API, falling back to %s. "
+            "Please report this at https://github.com/tronikos/python-google-weather-api/issues",
+            cls.__name__,
+            value,
+            unspecified,
+        )
+        return unspecified
 
 
 @dataclass
@@ -53,7 +78,7 @@ class LocalizedText(DataClassJSONMixin):
 class Temperature(DataClassJSONMixin):
     """Represents a temperature value."""
 
-    class TemperatureUnit(StrEnum):
+    class TemperatureUnit(ApiStrEnum):
         """Represents a unit used to measure temperatures."""
 
         TEMPERATURE_UNIT_UNSPECIFIED = "TEMPERATURE_UNIT_UNSPECIFIED"
@@ -71,7 +96,7 @@ class Temperature(DataClassJSONMixin):
 class QuantitativePrecipitationForecast(DataClassJSONMixin):
     """Represents the expected amount of melted precipitation."""
 
-    class Unit(StrEnum):
+    class Unit(ApiStrEnum):
         """Represents the unit used to measure the amount of accumulated precipitation."""
 
         UNIT_UNSPECIFIED = "UNIT_UNSPECIFIED"
@@ -89,7 +114,7 @@ class QuantitativePrecipitationForecast(DataClassJSONMixin):
 class PrecipitationProbability(DataClassJSONMixin):
     """Represents the probability of precipitation at a given location."""
 
-    class PrecipitationType(StrEnum):
+    class PrecipitationType(ApiStrEnum):
         """Represents the type of precipitation at a given location."""
 
         PRECIPITATION_TYPE_UNSPECIFIED = "PRECIPITATION_TYPE_UNSPECIFIED"
@@ -127,7 +152,7 @@ class Precipitation(DataClassJSONMixin):
 class WindSpeed(DataClassJSONMixin):
     """Represents the speed of the wind."""
 
-    class SpeedUnit(StrEnum):
+    class SpeedUnit(ApiStrEnum):
         """Represents the unit used to measure speed."""
 
         SPEED_UNIT_UNSPECIFIED = "SPEED_UNIT_UNSPECIFIED"
@@ -145,7 +170,7 @@ class WindSpeed(DataClassJSONMixin):
 class WindDirection(DataClassJSONMixin):
     """Represents the direction from which the wind originates."""
 
-    class CardinalDirection(StrEnum):
+    class CardinalDirection(ApiStrEnum):
         """Represents a cardinal direction (including ordinal directions)."""
 
         CARDINAL_DIRECTION_UNSPECIFIED = "CARDINAL_DIRECTION_UNSPECIFIED"
@@ -191,7 +216,7 @@ class Wind(DataClassJSONMixin):
 class Visibility(DataClassJSONMixin):
     """Represents visibility conditions, the distance at which objects can be discerned."""
 
-    class Unit(StrEnum):
+    class Unit(ApiStrEnum):
         """Represents the unit used to measure the visibility distance."""
 
         UNIT_UNSPECIFIED = "UNIT_UNSPECIFIED"
@@ -209,7 +234,7 @@ class Visibility(DataClassJSONMixin):
 class WeatherCondition(DataClassJSONMixin):
     """Represents a weather condition for a given location at a given period of time."""
 
-    class Type(StrEnum):
+    class Type(ApiStrEnum):
         """Marks the weather condition type in a forecast element's context."""
 
         TYPE_UNSPECIFIED = "TYPE_UNSPECIFIED"
@@ -268,7 +293,7 @@ class WeatherCondition(DataClassJSONMixin):
 class IceThickness(DataClassJSONMixin):
     """Represents ice thickness conditions."""
 
-    class Unit(StrEnum):
+    class Unit(ApiStrEnum):
         """Represents the unit used to measure the ice thickness."""
 
         UNIT_UNSPECIFIED = "UNIT_UNSPECIFIED"
@@ -419,7 +444,7 @@ class SunEvents(DataClassJSONMixin):
 class MoonEvents(DataClassJSONMixin):
     """Represents the events related to the moon (e.g. moonrise, moonset)."""
 
-    class MoonPhase(StrEnum):
+    class MoonPhase(ApiStrEnum):
         """Marks the moon phase (a.k.a. lunar phase)."""
 
         MOON_PHASE_UNSPECIFIED = "MOON_PHASE_UNSPECIFIED"
