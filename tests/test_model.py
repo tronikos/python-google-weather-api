@@ -13,8 +13,10 @@ from google_weather_api import (
     HourlyForecastResponse,
     IceThickness,
     Interval,
+    MinuteForecastResponse,
     MoonEvents,
     PrecipitationProbability,
+    PrecipitationSegment,
     QuantitativePrecipitationForecast,
     Temperature,
     Visibility,
@@ -141,3 +143,32 @@ def test_next_page_token_is_optional() -> None:
     data.pop("nextPageToken", None)
 
     assert DailyForecastResponse.from_dict(data).next_page_token is None
+
+
+def test_minute_forecast_segment_defaults() -> None:
+    """Test parsing a minute forecast where proto3-default segment fields are omitted."""
+    response = MinuteForecastResponse.from_dict(
+        {
+            "overallPredictionTimeframe": {"startTime": "2026-08-11T14:17:00Z"},
+            "timeZone": {"id": "America/New_York"},
+            "segments": [{"timeFrame": {"startTime": "2026-08-11T14:16:00Z"}, "type": "NONE"}],
+        }
+    )
+    segment = response.segments[0]
+    assert segment.type is PrecipitationSegment.DominantPrecipitationType.NONE
+    assert segment.probability == 0
+    assert segment.qpf is None
+    assert segment.snowfall_amount is None
+    assert segment.intensity is PrecipitationSegment.PrecipitationIntensity.PRECIPITATION_INTENSITY_UNSPECIFIED
+    assert response.next_page_token is None
+
+
+def test_minute_forecast_without_segments() -> None:
+    """Test parsing a minute forecast response where the segments list is omitted."""
+    response = MinuteForecastResponse.from_dict(
+        {
+            "overallPredictionTimeframe": {"startTime": "2026-08-11T14:17:00Z"},
+            "timeZone": {"id": "America/New_York"},
+        }
+    )
+    assert response.segments == []

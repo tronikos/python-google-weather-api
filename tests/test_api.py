@@ -267,3 +267,36 @@ async def test_custom_timeout(session: aiohttp.ClientSession) -> None:
     api = GoogleWeatherApi(session=session, api_key=API_KEY, timeout=30)
 
     assert api.timeout.total == 30
+
+
+async def test_get_minute_forecast(api: GoogleWeatherApi, mock_server: MockServer) -> None:
+    """Test fetching the minute forecast, which must not send language_code."""
+    mock_server.add_response(load_fixture("minute_forecast"))
+
+    result = await api.async_get_minute_forecast(LATITUDE, LONGITUDE)
+
+    assert result.time_zone.id == "America/New_York"
+    assert result.overall_prediction_timeframe.start_time == "2026-08-11T14:17:00Z"
+    assert len(result.segments) == 2
+    assert result.segments[0].probability == 62
+    request = mock_server.requests[0]
+    assert request.path == "/v1/forecast/minutes:lookup"
+    assert request.query["page_size"] == "360"
+    assert "language_code" not in request.query
+
+
+async def test_get_minute_forecast_pagination(api: GoogleWeatherApi, mock_server: MockServer) -> None:
+    """Test minute forecast segments spanning several pages are combined into one response."""
+    page1 = load_fixture("minute_forecast")
+    page1["nextPageToken"] = "next-page"
+    page2 = load_fixture("minute_forecast")
+    mock_server.add_response(page1)
+    mock_server.add_response(page2)
+
+    result = await api.async_get_minute_forecast(LATITUDE, LONGITUDE)
+
+    assert len(result.segments) == 4
+    first, second = mock_server.requests
+    assert "page_token" not in first.query
+    assert second.query["page_token"] == page1["nextPageToken"]
+    assert "language_code" not in second.query
