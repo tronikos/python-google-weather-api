@@ -166,11 +166,14 @@ class GoogleWeatherApi:
         )
         return DailyForecastResponse.from_dict(data)
 
-    async def async_get_minute_forecast(self, latitude: float, longitude: float, minutes: int = 360) -> MinuteForecastResponse:
-        """Fetch minute-by-minute precipitation nowcast for up to 6 hours.
+    async def async_get_minute_forecast(
+        self, latitude: float, longitude: float, page_size: int = 360
+    ) -> MinuteForecastResponse:
+        """Fetch the precipitation nowcast for up to 6 hours.
 
-        The endpoint does not accept language_code (a reserved field in google.maps.weather.v1),
-        so it is omitted from these requests.
+        Segments cover 2- or 15-minute intervals depending on the location. The endpoint
+        does not accept language_code (a reserved field in google.maps.weather.v1), so it
+        is omitted from these requests.
 
         See https://developers.google.com/maps/documentation/weather/minute-forecast
         """
@@ -181,7 +184,7 @@ class GoogleWeatherApi:
                 "location.longitude": longitude,
             },
             "segments",
-            minutes,
+            page_size,
             include_language_code=False,
         )
         return MinuteForecastResponse.from_dict(data)

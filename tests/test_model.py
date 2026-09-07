@@ -34,12 +34,15 @@ _RESPONSES = [
     (CurrentConditionsResponse, "current_conditions"),
     (DailyForecastResponse, "daily_forecast"),
     (HourlyForecastResponse, "hourly_forecast_page1"),
+    (MinuteForecastResponse, "minute_forecast"),
 ]
 
 _ENUMS = [
     IceThickness.Unit,
     MoonEvents.MoonPhase,
     PrecipitationProbability.PrecipitationType,
+    PrecipitationSegment.DominantPrecipitationType,
+    PrecipitationSegment.PrecipitationIntensity,
     QuantitativePrecipitationForecast.Unit,
     Temperature.TemperatureUnit,
     Visibility.Unit,
