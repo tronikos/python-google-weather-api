@@ -17,6 +17,7 @@ from .model import (
     CurrentConditionsResponse,
     DailyForecastResponse,
     HourlyForecastResponse,
+    MinuteForecastResponse,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class GoogleWeatherApi:
         self.referrer = referrer
         self.timeout = aiohttp.ClientTimeout(total=timeout)
 
-    async def _async_get(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
+    async def _async_get(self, endpoint: str, params: dict[str, Any], *, include_language_code: bool = True) -> dict[str, Any]:
         """Perform a GET request."""
         url = f"{_BASE_URL}/{endpoint}"
         headers = {aiohttp.hdrs.USER_AGENT: _USER_AGENT}
@@ -53,9 +54,10 @@ class GoogleWeatherApi:
             headers[aiohttp.hdrs.REFERER] = self.referrer
         params = {
             **params,
-            "language_code": self.language_code,
             "units_system": self.units_system,
         }
+        if include_language_code:
+            params["language_code"] = self.language_code
         # Log before adding the API key so it doesn't end up in debug logs.
         _LOGGER.debug("GET %s with params: %s", url, params)
         params["key"] = self.api_key
@@ -89,18 +91,27 @@ class GoogleWeatherApi:
             raise GoogleWeatherApiConnectionError(err) from err
 
     async def _async_get_all_pages(
-        self, endpoint: str, params: dict[str, Any], records_key: str, limit: int
+        self,
+        endpoint: str,
+        params: dict[str, Any],
+        records_key: str,
+        limit: int,
+        *,
+        include_language_code: bool = True,
     ) -> dict[str, Any]:
         """Perform a GET request, following pagination until `limit` records are collected.
 
-        The API caps the number of records it returns per page (24 for hourly forecasts),
-        regardless of the requested page size, so a single request is not enough.
+        Some endpoints cap the number of records they return per page regardless of the
+        requested page size, for example 24 for hourly forecasts, so a single request is
+        not always enough.
         """
         params = {**params, "page_size": limit}
-        data = await self._async_get(endpoint, params)
+        data = await self._async_get(endpoint, params, include_language_code=include_language_code)
         records: list[Any] = data.get(records_key, [])
         while len(records) < limit and (page_token := data.get("nextPageToken")):
-            data = await self._async_get(endpoint, {**params, "page_token": page_token})
+            data = await self._async_get(
+                endpoint, {**params, "page_token": page_token}, include_language_code=include_language_code
+            )
             page_records: list[Any] = data.get(records_key, [])
             if not page_records:
                 break
@@ -155,3 +166,26 @@ class GoogleWeatherApi:
             days,
         )
         return DailyForecastResponse.from_dict(data)
+
+    async def async_get_minute_forecast(
+        self, latitude: float, longitude: float, page_size: int = 360
+    ) -> MinuteForecastResponse:
+        """Fetch the precipitation nowcast for up to 6 hours.
+
+        Segments cover 2- or 15-minute intervals depending on the location. The endpoint
+        does not accept language_code (a reserved field in google.maps.weather.v1), so it
+        is omitted from these requests.
+
+        See https://developers.google.com/maps/documentation/weather/minute-forecast
+        """
+        data = await self._async_get_all_pages(
+            "forecast/minutes:lookup",
+            {
+                "location.latitude": latitude,
+                "location.longitude": longitude,
+            },
+            "segments",
+            page_size,
+            include_language_code=False,
+        )
+        return MinuteForecastResponse.from_dict(data)

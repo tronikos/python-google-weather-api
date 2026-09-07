@@ -639,3 +639,64 @@ class HourlyForecastResponse(BaseModel):
 
     next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
     """The token to retrieve the next page."""
+
+
+@dataclass
+class PrecipitationSegment(BaseModel):
+    """Represents a segment of precipitation forecast data."""
+
+    class DominantPrecipitationType(ApiStrEnum):
+        """Represents the type of precipitation of a segment."""
+
+        DOMINANT_PRECIPITATION_TYPE_UNSPECIFIED = "DOMINANT_PRECIPITATION_TYPE_UNSPECIFIED"
+        NONE = "NONE"
+        RAIN = "RAIN"
+        SNOW = "SNOW"
+        HAIL = "HAIL"
+
+    class PrecipitationIntensity(ApiStrEnum):
+        """Represents the precipitation intensity of a segment."""
+
+        PRECIPITATION_INTENSITY_UNSPECIFIED = "PRECIPITATION_INTENSITY_UNSPECIFIED"
+        NO_INTENSITY = "NO_INTENSITY"
+        LIGHT = "LIGHT"
+        MID_LIGHT = "MID_LIGHT"
+        MODERATE = "MODERATE"
+        MID_MODERATE = "MID_MODERATE"
+        HEAVY = "HEAVY"
+        MID_HEAVY = "MID_HEAVY"
+
+    time_frame: Interval = field(metadata={"alias": "timeFrame"})
+    """The timeframe relevant to the segment."""
+
+    type: DominantPrecipitationType = DominantPrecipitationType.DOMINANT_PRECIPITATION_TYPE_UNSPECIFIED
+    """A code that indicates the type of precipitation."""
+
+    probability: int = 0
+    """The chance of precipitation (values from 0 to 100)."""
+
+    qpf: QuantitativePrecipitationForecast | None = None
+    """The amount of precipitation, measured as liquid water equivalent."""
+
+    snowfall_amount: QuantitativePrecipitationForecast | None = field(default=None, metadata={"alias": "snowfallAmount"})
+    """The amount of snow accumulation, measured as liquid water equivalent."""
+
+    intensity: PrecipitationIntensity = PrecipitationIntensity.PRECIPITATION_INTENSITY_UNSPECIFIED
+    """A code that indicates the precipitation intensity of the segment."""
+
+
+@dataclass
+class MinuteForecastResponse(BaseModel):
+    """Response model for the forecast.minutes.lookup method."""
+
+    overall_prediction_timeframe: Interval = field(metadata={"alias": "overallPredictionTimeframe"})
+    """The overall timeframe for the predictions."""
+
+    time_zone: TimeZone = field(metadata={"alias": "timeZone"})
+    """The time zone at the requested location."""
+
+    segments: list[PrecipitationSegment] = field(default_factory=list)
+    """The minute-level prediction segments."""
+
+    next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
+    """The token to retrieve the next page."""

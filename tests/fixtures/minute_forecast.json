@@ -1,0 +1,47 @@
+{
+  "overallPredictionTimeframe": {
+    "startTime": "2026-08-11T14:17:00Z",
+    "endTime": "2026-08-11T20:17:00Z"
+  },
+  "timeZone": {
+    "id": "America/New_York",
+    "version": ""
+  },
+  "nextPageToken": "",
+  "segments": [
+    {
+      "timeFrame": {
+        "startTime": "2026-08-11T14:16:00Z",
+        "endTime": "2026-08-11T14:18:00Z"
+      },
+      "type": "RAIN",
+      "probability": 62,
+      "qpf": {
+        "unit": "MILLIMETERS",
+        "quantity": 0.5
+      },
+      "snowfallAmount": {
+        "unit": "MILLIMETERS",
+        "quantity": 0
+      },
+      "intensity": "MODERATE"
+    },
+    {
+      "timeFrame": {
+        "startTime": "2026-08-11T14:18:00Z",
+        "endTime": "2026-08-11T14:20:00Z"
+      },
+      "type": "NONE",
+      "probability": 0,
+      "qpf": {
+        "unit": "MILLIMETERS",
+        "quantity": 0
+      },
+      "snowfallAmount": {
+        "unit": "MILLIMETERS",
+        "quantity": 0
+      },
+      "intensity": "NO_INTENSITY"
+    }
+  ]
+}
