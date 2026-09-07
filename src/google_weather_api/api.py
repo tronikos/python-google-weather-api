@@ -101,8 +101,9 @@ class GoogleWeatherApi:
     ) -> dict[str, Any]:
         """Perform a GET request, following pagination until `limit` records are collected.
 
-        The API caps the number of records it returns per page (24 for hourly forecasts),
-        regardless of the requested page size, so a single request is not enough.
+        Some endpoints cap the number of records they return per page regardless of the
+        requested page size, for example 24 for hourly forecasts, so a single request is
+        not always enough.
         """
         params = {**params, "page_size": limit}
         data = await self._async_get(endpoint, params, include_language_code=include_language_code)
