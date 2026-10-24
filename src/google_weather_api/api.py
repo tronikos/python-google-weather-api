@@ -23,6 +23,8 @@ from .model import (
 _LOGGER = logging.getLogger(__name__)
 
 _BASE_URL = "https://weather.googleapis.com/v1"
+# See https://docs.cloud.google.com/docs/authentication/api-keys-use
+_API_KEY_HEADER = "X-Goog-Api-Key"
 _USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
 
 
@@ -49,7 +51,10 @@ class GoogleWeatherApi:
     async def _async_get(self, endpoint: str, params: dict[str, Any], *, include_language_code: bool = True) -> dict[str, Any]:
         """Perform a GET request."""
         url = f"{_BASE_URL}/{endpoint}"
-        headers = {aiohttp.hdrs.USER_AGENT: _USER_AGENT}
+        # Send the API key in a header rather than the "key" query parameter so it
+        # never ends up in a URL, which aiohttp includes in exceptions such as
+        # ContentTypeError and which callers commonly log.
+        headers = {aiohttp.hdrs.USER_AGENT: _USER_AGENT, _API_KEY_HEADER: self.api_key}
         if self.referrer:
             headers[aiohttp.hdrs.REFERER] = self.referrer
         params = {
@@ -58,9 +63,7 @@ class GoogleWeatherApi:
         }
         if include_language_code:
             params["language_code"] = self.language_code
-        # Log before adding the API key so it doesn't end up in debug logs.
         _LOGGER.debug("GET %s with params: %s", url, params)
-        params["key"] = self.api_key
         try:
             async with self.session.get(
                 url,

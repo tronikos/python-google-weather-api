@@ -41,7 +41,8 @@ async def test_request_params_and_headers(api: GoogleWeatherApi, mock_server: Mo
     await api.async_get_current_conditions(LATITUDE, LONGITUDE)
 
     request = mock_server.requests[0]
-    assert request.query["key"] == API_KEY
+    assert request.headers["X-Goog-Api-Key"] == API_KEY
+    assert "key" not in request.query
     assert request.query["location.latitude"] == str(LATITUDE)
     assert request.query["location.longitude"] == str(LONGITUDE)
     assert request.query["language_code"] == "en"
@@ -126,7 +127,7 @@ async def test_get_hourly_forecast_follows_pagination(api: GoogleWeatherApi, moc
     assert first.query["hours"] == "4"
     assert second.query["page_token"] == page1["nextPageToken"]
     assert second.query["hours"] == "4"
-    assert second.query["key"] == API_KEY
+    assert second.headers["X-Goog-Api-Key"] == API_KEY
 
 
 async def test_hourly_forecast_stops_once_enough_records(api: GoogleWeatherApi, mock_server: MockServer) -> None:
@@ -236,6 +237,23 @@ async def test_non_json_response(api: GoogleWeatherApi, mock_server: MockServer)
 
     with pytest.raises(GoogleWeatherApiConnectionError):
         await api.async_get_current_conditions(LATITUDE, LONGITUDE)
+
+
+async def test_api_key_not_in_error_message(api: GoogleWeatherApi, mock_server: MockServer) -> None:
+    """Test the API key does not leak into errors that include the request URL.
+
+    aiohttp includes the full request URL in ContentTypeError, which callers
+    commonly log, e.g. for a 502 HTML page from a proxy in front of the API.
+    """
+    mock_server.add_response("<html>502 Bad Gateway</html>", status=HTTPStatus.BAD_GATEWAY)
+
+    with pytest.raises(GoogleWeatherApiConnectionError) as exc_info:
+        await api.async_get_current_conditions(LATITUDE, LONGITUDE)
+
+    assert "currentConditions:lookup" in str(exc_info.value)
+    assert API_KEY not in str(exc_info.value)
+    # Tracebacks render chained exceptions with str(), so the cause must be clean too.
+    assert API_KEY not in str(exc_info.value.__cause__)
 
 
 @pytest.mark.parametrize(
