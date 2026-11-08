@@ -4,6 +4,7 @@ from .api import GoogleWeatherApi
 from .exceptions import (
     GoogleWeatherApiAuthError,
     GoogleWeatherApiConnectionError,
+    GoogleWeatherApiConnectionTimeoutError,
     GoogleWeatherApiError,
     GoogleWeatherApiResponseError,
 )
@@ -50,6 +51,7 @@ __all__ = [
     "GoogleWeatherApi",
     "GoogleWeatherApiAuthError",
     "GoogleWeatherApiConnectionError",
+    "GoogleWeatherApiConnectionTimeoutError",
     "GoogleWeatherApiError",
     "GoogleWeatherApiResponseError",
     "HourlyForecastResponse",

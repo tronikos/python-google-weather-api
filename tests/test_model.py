@@ -175,3 +175,14 @@ def test_minute_forecast_without_segments() -> None:
         }
     )
     assert response.segments == []
+
+
+def test_daily_and_hourly_forecasts_without_records() -> None:
+    """Test parsing daily and hourly forecast responses when records lists are omitted."""
+    daily = DailyForecastResponse.from_dict({"timeZone": {"id": "America/New_York"}})
+    assert daily.forecast_days == []
+    assert "nextPageToken" not in daily.to_dict()
+
+    hourly = HourlyForecastResponse.from_dict({"timeZone": {"id": "America/New_York"}})
+    assert hourly.forecast_hours == []
+    assert "nextPageToken" not in hourly.to_dict()

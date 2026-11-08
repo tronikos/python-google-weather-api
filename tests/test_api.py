@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 from http import HTTPStatus
+from pathlib import Path
 from typing import Any
 
 import aiohttp
@@ -14,6 +16,7 @@ from google_weather_api import (
     GoogleWeatherApi,
     GoogleWeatherApiAuthError,
     GoogleWeatherApiConnectionError,
+    GoogleWeatherApiConnectionTimeoutError,
     GoogleWeatherApiResponseError,
 )
 
@@ -231,6 +234,32 @@ async def test_error_responses(
         await api.async_get_current_conditions(LATITUDE, LONGITUDE)
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"error": {"code": 504, "message": "Deadline expired.", "status": "DEADLINE_EXCEEDED"}},
+        "<html>504 Gateway Timeout</html>",
+    ],
+)
+async def test_gateway_timeout_is_a_timeout_error(api: GoogleWeatherApi, mock_server: MockServer, payload: Any) -> None:
+    """Test an HTTP 504 is reported as a timeout, like a client side timeout."""
+    mock_server.add_response(payload, status=HTTPStatus.GATEWAY_TIMEOUT)
+
+    with pytest.raises(GoogleWeatherApiConnectionTimeoutError, match="Timeout") as exc_info:
+        await api.async_get_current_conditions(LATITUDE, LONGITUDE)
+
+    assert isinstance(exc_info.value, GoogleWeatherApiConnectionError)
+    assert isinstance(exc_info.value, TimeoutError)
+
+
+async def test_empty_error_body(api: GoogleWeatherApi, mock_server: MockServer) -> None:
+    """Test an error response without a JSON object is still mapped to an exception."""
+    mock_server.add_response(None, status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    with pytest.raises(GoogleWeatherApiResponseError, match="Unknown API error"):
+        await api.async_get_current_conditions(LATITUDE, LONGITUDE)
+
+
 async def test_non_json_response(api: GoogleWeatherApi, mock_server: MockServer) -> None:
     """Test a non-JSON body is reported as a connection error."""
     mock_server.add_response("<html>502 Bad Gateway</html>", status=HTTPStatus.BAD_GATEWAY)
@@ -301,3 +330,45 @@ async def test_get_minute_forecast(api: GoogleWeatherApi, mock_server: MockServe
     assert request.path == "/v1/forecast/minutes:lookup"
     assert request.query["page_size"] == "360"
     assert "language_code" not in request.query
+
+
+def _load_dotenv() -> dict[str, str]:
+    """Load credentials from .env or environment variables."""
+    env: dict[str, str] = {}
+    env_file = Path(__file__).resolve().parent.parent / ".env"
+    if env_file.is_file():
+        for raw_line in env_file.read_text().splitlines():
+            line = raw_line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, _, value = line.partition("=")
+                env[key.strip()] = value.strip()
+    for key in ("GOOGLE_API_KEY", "GOOGLE_REFERRER"):
+        if val := os.environ.get(key):
+            env[key] = val
+    return env
+
+
+@pytest.mark.network
+async def test_live_weather_endpoints(session: aiohttp.ClientSession) -> None:
+    """Test fetching live weather data from the Google Weather API using .env credentials."""
+    env = _load_dotenv()
+    api_key = env.get("GOOGLE_API_KEY")
+    if not api_key:
+        pytest.skip("GOOGLE_API_KEY not set in .env or environment")
+    client = GoogleWeatherApi(
+        session=session,
+        api_key=api_key,
+        referrer=env.get("GOOGLE_REFERRER"),
+    )
+    current = await client.async_get_current_conditions(LATITUDE, LONGITUDE)
+    assert current.time_zone.id
+    assert current.temperature.unit == "CELSIUS"
+
+    daily = await client.async_get_daily_forecast(LATITUDE, LONGITUDE, days=2)
+    assert len(daily.forecast_days) == 2
+
+    hourly = await client.async_get_hourly_forecast(LATITUDE, LONGITUDE, hours=2)
+    assert len(hourly.forecast_hours) == 2
+
+    minute = await client.async_get_minute_forecast(LATITUDE, LONGITUDE, page_size=10)
+    assert minute.time_zone.id

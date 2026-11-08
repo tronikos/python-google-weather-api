@@ -11,6 +11,7 @@ import aiohttp
 from .exceptions import (
     GoogleWeatherApiAuthError,
     GoogleWeatherApiConnectionError,
+    GoogleWeatherApiConnectionTimeoutError,
     GoogleWeatherApiResponseError,
 )
 from .model import (
@@ -71,27 +72,32 @@ class GoogleWeatherApi:
                 headers=headers,
                 timeout=self.timeout,
             ) as resp:
-                res: dict[str, Any] = await resp.json()
                 _LOGGER.debug("Got %s for %s", resp.status, url)
-                if resp.status != HTTPStatus.OK:
-                    error_data = res.get("error", {})
-                    error_msg = error_data.get("message", "Unknown API error")
-
-                    if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
-                        raise GoogleWeatherApiAuthError(error_msg)
-
-                    # Google APIs often return 400 Bad Request for invalid API keys
-                    if resp.status == HTTPStatus.BAD_REQUEST:
-                        for detail in error_data.get("details", []):
-                            if detail.get("reason") == "API_KEY_INVALID":
-                                raise GoogleWeatherApiAuthError(error_msg)
-
-                    raise GoogleWeatherApiResponseError(error_msg)
-                return res
+                status_code = resp.status
+                body = None if status_code == HTTPStatus.GATEWAY_TIMEOUT else await resp.json()
         except TimeoutError as err:
-            raise GoogleWeatherApiConnectionError("Timeout") from err
+            raise GoogleWeatherApiConnectionTimeoutError("Timeout") from err
         except aiohttp.ClientError as err:
             raise GoogleWeatherApiConnectionError(err) from err
+
+        if status_code == HTTPStatus.GATEWAY_TIMEOUT:
+            raise GoogleWeatherApiConnectionTimeoutError("Timeout")
+        res: dict[str, Any] = body if isinstance(body, dict) else {}
+        if status_code != HTTPStatus.OK:
+            error_data = res.get("error", {})
+            error_msg = error_data.get("message", "Unknown API error")
+
+            if status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+                raise GoogleWeatherApiAuthError(error_msg)
+
+            # Google APIs often return 400 Bad Request for invalid API keys
+            if status_code == HTTPStatus.BAD_REQUEST:
+                for detail in error_data.get("details", []):
+                    if detail.get("reason") == "API_KEY_INVALID":
+                        raise GoogleWeatherApiAuthError(error_msg)
+
+            raise GoogleWeatherApiResponseError(error_msg)
+        return res
 
     async def _async_get_all_pages(
         self,

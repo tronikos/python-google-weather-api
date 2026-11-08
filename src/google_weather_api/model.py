@@ -42,6 +42,7 @@ class BaseModel(DataClassJSONMixin):
 
         serialize_by_alias = True
         allow_deserialization_not_by_alias = True
+        omit_none = True
 
 
 @dataclass
@@ -523,11 +524,11 @@ class ForecastDay(BaseModel):
 class DailyForecastResponse(BaseModel):
     """Response model for the forecast.days.lookup method."""
 
-    forecast_days: list[ForecastDay] = field(metadata={"alias": "forecastDays"})
-    """The daily forecast records."""
-
     time_zone: TimeZone = field(metadata={"alias": "timeZone"})
     """The time zone at the requested location."""
+
+    forecast_days: list[ForecastDay] = field(default_factory=list, metadata={"alias": "forecastDays"})
+    """The daily forecast records."""
 
     next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
     """The token to retrieve the next page."""
@@ -631,11 +632,11 @@ class ForecastHour(BaseModel):
 class HourlyForecastResponse(BaseModel):
     """Response model for the forecast.hours.lookup method."""
 
-    forecast_hours: list[ForecastHour] = field(metadata={"alias": "forecastHours"})
-    """The hourly forecast records."""
-
     time_zone: TimeZone = field(metadata={"alias": "timeZone"})
     """The time zone at the requested location."""
+
+    forecast_hours: list[ForecastHour] = field(default_factory=list, metadata={"alias": "forecastHours"})
+    """The hourly forecast records."""
 
     next_page_token: str | None = field(default=None, metadata={"alias": "nextPageToken"})
     """The token to retrieve the next page."""

@@ -31,7 +31,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--cov=google_weather_api --cov-report=term-missing --cov-fail-under=90"
+addopts = "-m 'not network' --cov=google_weather_api --cov-report=term-missing --cov-fail-under=90"
+markers = [
+    "network: tests that hit the live Google Weather API (deselected by default)",
+]
 
 [tool.coverage.run]
 branch = true
