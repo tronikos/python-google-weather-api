@@ -135,6 +135,7 @@ def test_optional_fields_may_be_absent() -> None:
     assert parsed.moon_events.moonrise_times == []
     assert parsed.moon_events.moonset_times == []
     assert parsed.ice_thickness is None
+    assert parsed.daytime_forecast is not None
     assert parsed.daytime_forecast.ice_thickness is None
     assert parsed.daytime_forecast.precipitation.snow_qpf is None
     assert parsed.interval.end_time is None
@@ -186,3 +187,104 @@ def test_daily_and_hourly_forecasts_without_records() -> None:
     hourly = HourlyForecastResponse.from_dict({"timeZone": {"id": "America/New_York"}})
     assert hourly.forecast_hours == []
     assert "nextPageToken" not in hourly.to_dict()
+
+
+def test_japan_and_south_korea_current_conditions(caplog: pytest.LogCaptureFixture) -> None:
+    """Test parsing current conditions with Japan/South Korea omitted and UNIT_UNSPECIFIED fields."""
+    data = load_fixture("current_conditions")
+    data["timeZone"] = {"id": "Asia/Tokyo", "version": ""}
+    data["heatIndex"] = {"unit": "UNIT_UNSPECIFIED"}
+    data["windChill"] = {"unit": "UNIT_UNSPECIFIED"}
+    data["visibility"] = {"unit": "UNIT_UNSPECIFIED"}
+    data["precipitation"]["snowQpf"] = {"unit": "UNIT_UNSPECIFIED"}
+    data["currentConditionsHistory"]["snowQpf"] = {"unit": "UNIT_UNSPECIFIED"}
+    data["wind"].pop("gust", None)
+    data.pop("cloudCover", None)
+    data.pop("thunderstormProbability", None)
+
+    with caplog.at_level(logging.WARNING, logger="google_weather_api"):
+        parsed = CurrentConditionsResponse.from_dict(data)
+
+    assert caplog.records == []
+    assert parsed.heat_index.degrees is None
+    assert parsed.heat_index.unit is Temperature.TemperatureUnit.UNIT_UNSPECIFIED
+    assert parsed.wind_chill.degrees is None
+    assert parsed.visibility.distance is None
+    assert parsed.visibility.unit is Visibility.Unit.UNIT_UNSPECIFIED
+    assert parsed.precipitation.snow_qpf is not None
+    assert parsed.precipitation.snow_qpf.quantity is None
+    assert parsed.current_conditions_history.snow_qpf is not None
+    assert parsed.current_conditions_history.snow_qpf.quantity is None
+    assert parsed.wind.gust is None
+    assert parsed.cloud_cover is None
+    assert parsed.thunderstorm_probability is None
+    assert CurrentConditionsResponse.from_dict(parsed.to_dict()) == parsed
+
+
+def test_japan_and_south_korea_daily_forecast(caplog: pytest.LogCaptureFixture) -> None:
+    """Test parsing Japan/South Korea fullDayForecast, regional condition types, and omitted fields."""
+    daily_data = load_fixture("daily_forecast")
+    day: dict[str, Any] = daily_data["forecastDays"][0]
+    full_day = day.pop("daytimeForecast")
+    day.pop("nighttimeForecast")
+    full_day["weatherCondition"]["type"] = "CLOUDY_PERIODICALLY_CLEAR"
+    full_day["wind"].pop("gust", None)
+    full_day.pop("cloudCover", None)
+    full_day.pop("thunderstormProbability", None)
+    full_day["iceThickness"] = {"unit": "UNIT_UNSPECIFIED"}
+    full_day["precipitation"]["snowQpf"] = {"unit": "UNIT_UNSPECIFIED"}
+    day["fullDayForecast"] = full_day
+    day["feelsLikeMaxTemperature"] = {"unit": "UNIT_UNSPECIFIED"}
+    day["feelsLikeMinTemperature"] = {"unit": "UNIT_UNSPECIFIED"}
+    day["maxHeatIndex"] = {"unit": "UNIT_UNSPECIFIED"}
+    day.pop("iceThickness", None)
+
+    with caplog.at_level(logging.WARNING, logger="google_weather_api"):
+        parsed_daily = DailyForecastResponse.from_dict(daily_data)
+
+    assert caplog.records == []
+    parsed_day = parsed_daily.forecast_days[0]
+    assert parsed_day.daytime_forecast is None
+    assert parsed_day.nighttime_forecast is None
+    assert parsed_day.full_day_forecast is not None
+    assert parsed_day.full_day_forecast.weather_condition.type is WeatherCondition.Type.CLOUDY_PERIODICALLY_CLEAR
+    assert parsed_day.full_day_forecast.wind.gust is None
+    assert parsed_day.full_day_forecast.cloud_cover is None
+    assert parsed_day.full_day_forecast.thunderstorm_probability is None
+    assert parsed_day.full_day_forecast.ice_thickness is not None
+    assert parsed_day.full_day_forecast.ice_thickness.thickness is None
+    assert parsed_day.feels_like_max_temperature.degrees is None
+    assert parsed_day.feels_like_min_temperature.degrees is None
+    assert parsed_day.max_heat_index.degrees is None
+    assert DailyForecastResponse.from_dict(parsed_daily.to_dict()) == parsed_daily
+    assert len(WeatherCondition.Type) == 139
+
+
+def test_japan_and_south_korea_hourly_forecast(caplog: pytest.LogCaptureFixture) -> None:
+    """Test parsing Japan/South Korea hourly forecast with omitted and UNIT_UNSPECIFIED fields."""
+    hourly_data = load_fixture("hourly_forecast_page1")
+    hour: dict[str, Any] = hourly_data["forecastHours"][0]
+    hour["heatIndex"] = {"unit": "UNIT_UNSPECIFIED"}
+    hour["windChill"] = {"unit": "UNIT_UNSPECIFIED"}
+    hour["wetBulbTemperature"] = {"unit": "UNIT_UNSPECIFIED"}
+    hour["visibility"] = {"unit": "UNIT_UNSPECIFIED"}
+    hour["iceThickness"] = {"unit": "UNIT_UNSPECIFIED"}
+    hour["wind"].pop("gust", None)
+    hour.pop("cloudCover", None)
+    hour.pop("thunderstormProbability", None)
+
+    with caplog.at_level(logging.WARNING, logger="google_weather_api"):
+        parsed_hourly = HourlyForecastResponse.from_dict(hourly_data)
+
+    assert caplog.records == []
+    parsed_hour = parsed_hourly.forecast_hours[0]
+    assert parsed_hour.heat_index.degrees is None
+    assert parsed_hour.wind_chill.degrees is None
+    assert parsed_hour.wet_bulb_temperature.degrees is None
+    assert parsed_hour.visibility.distance is None
+    assert parsed_hour.ice_thickness is not None
+    assert parsed_hour.ice_thickness.thickness is None
+    assert parsed_hour.wind.gust is None
+    assert parsed_hour.cloud_cover is None
+    assert parsed_hour.thunderstorm_probability is None
+    assert HourlyForecastResponse.from_dict(parsed_hourly.to_dict()) == parsed_hourly

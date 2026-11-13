@@ -93,14 +93,14 @@ class Temperature(BaseModel):
     class TemperatureUnit(ApiStrEnum):
         """Represents a unit used to measure temperatures."""
 
-        TEMPERATURE_UNIT_UNSPECIFIED = "TEMPERATURE_UNIT_UNSPECIFIED"
+        UNIT_UNSPECIFIED = "UNIT_UNSPECIFIED"
         CELSIUS = "CELSIUS"
         FAHRENHEIT = "FAHRENHEIT"
 
-    degrees: float
+    degrees: float | None = None
     """The temperature value (in degrees) in the specified unit."""
 
-    unit: TemperatureUnit
+    unit: TemperatureUnit = TemperatureUnit.UNIT_UNSPECIFIED
     """The code for the unit used to measure the temperature value."""
 
 
@@ -115,10 +115,10 @@ class QuantitativePrecipitationForecast(BaseModel):
         MILLIMETERS = "MILLIMETERS"
         INCHES = "INCHES"
 
-    quantity: float
+    quantity: float | None = None
     """The amount of precipitation, measured as liquid water equivalent."""
 
-    unit: Unit
+    unit: Unit = Unit.UNIT_UNSPECIFIED
     """The code of the unit used to measure the amount of accumulated precipitation."""
 
 
@@ -129,7 +129,7 @@ class PrecipitationProbability(BaseModel):
     class PrecipitationType(ApiStrEnum):
         """Represents the type of precipitation at a given location."""
 
-        PRECIPITATION_TYPE_UNSPECIFIED = "PRECIPITATION_TYPE_UNSPECIFIED"
+        TYPE_UNSPECIFIED = "TYPE_UNSPECIFIED"
         NONE = "NONE"
         SNOW = "SNOW"
         RAIN = "RAIN"
@@ -138,6 +138,7 @@ class PrecipitationProbability(BaseModel):
         RAIN_AND_SNOW = "RAIN_AND_SNOW"
         SLEET = "SLEET"
         FREEZING_RAIN = "FREEZING_RAIN"
+        PRECIPITATION_TYPE_HAIL = "PRECIPITATION_TYPE_HAIL"
 
     type: PrecipitationType
     """A code that indicates the type of precipitation."""
@@ -167,14 +168,14 @@ class WindSpeed(BaseModel):
     class SpeedUnit(ApiStrEnum):
         """Represents the unit used to measure speed."""
 
-        SPEED_UNIT_UNSPECIFIED = "SPEED_UNIT_UNSPECIFIED"
+        UNIT_UNSPECIFIED = "UNIT_UNSPECIFIED"
         KILOMETERS_PER_HOUR = "KILOMETERS_PER_HOUR"
         MILES_PER_HOUR = "MILES_PER_HOUR"
 
-    value: float
+    value: float | None = None
     """The value of the wind speed."""
 
-    unit: SpeedUnit
+    unit: SpeedUnit = SpeedUnit.UNIT_UNSPECIFIED
     """The code that represents the unit used to measure the wind speed."""
 
 
@@ -185,7 +186,7 @@ class WindDirection(BaseModel):
     class CardinalDirection(ApiStrEnum):
         """Represents a cardinal direction (including ordinal directions)."""
 
-        CARDINAL_DIRECTION_UNSPECIFIED = "CARDINAL_DIRECTION_UNSPECIFIED"
+        CARDINAL_UNSPECIFIED = "CARDINAL_UNSPECIFIED"
         NORTH = "NORTH"
         NORTH_NORTHEAST = "NORTH_NORTHEAST"
         NORTHEAST = "NORTHEAST"
@@ -220,7 +221,7 @@ class Wind(BaseModel):
     speed: WindSpeed
     """The speed of the wind."""
 
-    gust: WindSpeed
+    gust: WindSpeed | None = None
     """The wind gust (sudden increase in the wind speed)."""
 
 
@@ -235,10 +236,10 @@ class Visibility(BaseModel):
         KILOMETERS = "KILOMETERS"
         MILES = "MILES"
 
-    distance: float
+    distance: float | None = None
     """The visibility distance in the specified unit."""
 
-    unit: Unit
+    unit: Unit = Unit.UNIT_UNSPECIFIED
     """The code that represents the unit used to measure the distance."""
 
 
@@ -290,6 +291,120 @@ class WeatherCondition(BaseModel):
         LIGHT_THUNDERSTORM_RAIN = "LIGHT_THUNDERSTORM_RAIN"
         SCATTERED_THUNDERSTORMS = "SCATTERED_THUNDERSTORMS"
         HEAVY_THUNDERSTORM = "HEAVY_THUNDERSTORM"
+        CLEAR_AFTER_FOG_IN_THE_MORNING = "CLEAR_AFTER_FOG_IN_THE_MORNING"
+        CLEAR_BUT_LATER_TURNING_CLOUDY = "CLEAR_BUT_LATER_TURNING_CLOUDY"
+        CLEAR_BUT_LATER_TURNING_TO_RAIN_AND_SNOW_MAIN_CONSTITUENT_RAIN = (
+            "CLEAR_BUT_LATER_TURNING_TO_RAIN_AND_SNOW_MAIN_CONSTITUENT_RAIN"
+        )
+        CLEAR_BUT_LATER_TURNING_TO_SNOW_AND_RAIN_MAIN_CONSTITUENT_SNOW = (
+            "CLEAR_BUT_LATER_TURNING_TO_SNOW_AND_RAIN_MAIN_CONSTITUENT_SNOW"
+        )
+        CLEAR_BUT_THUNDERSTORMS_LATER = "CLEAR_BUT_THUNDERSTORMS_LATER"
+        CLEAR_IN_THE_MORNING_BUT_CLOUDY_IN_THE_EVENING = "CLEAR_IN_THE_MORNING_BUT_CLOUDY_IN_THE_EVENING"
+        CLEAR_IN_THE_MORNING_WITH_BRIEF_RAIN_IN_THE_EVENING = "CLEAR_IN_THE_MORNING_WITH_BRIEF_RAIN_IN_THE_EVENING"
+        CLEAR_MORNING_WITH_BRIEF_RAIN = "CLEAR_MORNING_WITH_BRIEF_RAIN"
+        CLEAR_WITH_BRIEF_RAIN = "CLEAR_WITH_BRIEF_RAIN"
+        CLEAR_WITH_BRIEF_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT = "CLEAR_WITH_BRIEF_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT"
+        CLEAR_WITH_BRIEF_RAIN_LATER = "CLEAR_WITH_BRIEF_RAIN_LATER"
+        CLEAR_WITH_BRIEF_SNOW = "CLEAR_WITH_BRIEF_SNOW"
+        CLEAR_WITH_BRIEF_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT = "CLEAR_WITH_BRIEF_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT"
+        CLEAR_WITH_BRIEF_SNOW_LATER = "CLEAR_WITH_BRIEF_SNOW_LATER"
+        CLEAR_WITH_PERIODIC_CLOUDS_LATER = "CLEAR_WITH_PERIODIC_CLOUDS_LATER"
+        CLEAR_WITH_PERIODIC_RAIN = "CLEAR_WITH_PERIODIC_RAIN"
+        CLEAR_WITH_PERIODIC_RAIN_ACCOMPANIED_BY_THUNDER = "CLEAR_WITH_PERIODIC_RAIN_ACCOMPANIED_BY_THUNDER"
+        CLEAR_WITH_PERIODIC_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT = (
+            "CLEAR_WITH_PERIODIC_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT"
+        )
+        CLEAR_WITH_PERIODIC_RAIN_LATER = "CLEAR_WITH_PERIODIC_RAIN_LATER"
+        CLEAR_WITH_PERIODIC_SNOW = "CLEAR_WITH_PERIODIC_SNOW"
+        CLEAR_WITH_PERIODIC_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT = (
+            "CLEAR_WITH_PERIODIC_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT"
+        )
+        CLEAR_WITH_PERIODIC_SNOW_LATER = "CLEAR_WITH_PERIODIC_SNOW_LATER"
+        CLEAR_WITH_RAIN_AFTER_MIDNIGHT = "CLEAR_WITH_RAIN_AFTER_MIDNIGHT"
+        CLEAR_WITH_RAIN_IN_THE_NIGHT = "CLEAR_WITH_RAIN_IN_THE_NIGHT"
+        CLEAR_WITH_RAIN_LATER = "CLEAR_WITH_RAIN_LATER"
+        CLEAR_WITH_SNOW_ALONG_THE_MOUNTAINS = "CLEAR_WITH_SNOW_ALONG_THE_MOUNTAINS"
+        CLEAR_WITH_SNOW_LATER = "CLEAR_WITH_SNOW_LATER"
+        CLEAR_WITH_THUNDERSTORMS_ALONG_THE_MOUNTAINS = "CLEAR_WITH_THUNDERSTORMS_ALONG_THE_MOUNTAINS"
+        CLEAR_WITH_THUNDERSTORMS_IN_THE_AFTERNOON = "CLEAR_WITH_THUNDERSTORMS_IN_THE_AFTERNOON"
+        CLOUDY_BUT_CLEAR_LATER = "CLOUDY_BUT_CLEAR_LATER"
+        CLOUDY_BUT_LATER_TURNING_TO_RAIN_AND_SNOW_MAIN_CONSTITUENT_RAIN = (
+            "CLOUDY_BUT_LATER_TURNING_TO_RAIN_AND_SNOW_MAIN_CONSTITUENT_RAIN"
+        )
+        CLOUDY_BUT_LATER_TURNING_TO_SNOW_AND_RAIN_MAIN_CONSTITUENT_SNOW = (
+            "CLOUDY_BUT_LATER_TURNING_TO_SNOW_AND_RAIN_MAIN_CONSTITUENT_SNOW"
+        )
+        CLOUDY_BUT_PERIODICALLY_CLEAR_LATER = "CLOUDY_BUT_PERIODICALLY_CLEAR_LATER"
+        CLOUDY_BUT_THUNDERSTORMS_LATER = "CLOUDY_BUT_THUNDERSTORMS_LATER"
+        CLOUDY_MORNING_WITH_BRIEF_RAIN = "CLOUDY_MORNING_WITH_BRIEF_RAIN"
+        CLOUDY_PERIODICALLY_CLEAR = "CLOUDY_PERIODICALLY_CLEAR"
+        CLOUDY_SNOWING_IN_THE_EVENING = "CLOUDY_SNOWING_IN_THE_EVENING"
+        CLOUDY_SNOWING_IN_THE_NIGHT = "CLOUDY_SNOWING_IN_THE_NIGHT"
+        CLOUDY_WITH_BRIEF_RAIN = "CLOUDY_WITH_BRIEF_RAIN"
+        CLOUDY_WITH_BRIEF_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT = "CLOUDY_WITH_BRIEF_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT"
+        CLOUDY_WITH_BRIEF_RAIN_LATER = "CLOUDY_WITH_BRIEF_RAIN_LATER"
+        CLOUDY_WITH_BRIEF_SNOW = "CLOUDY_WITH_BRIEF_SNOW"
+        CLOUDY_WITH_BRIEF_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT = "CLOUDY_WITH_BRIEF_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT"
+        CLOUDY_WITH_BRIEF_SNOW_LATER = "CLOUDY_WITH_BRIEF_SNOW_LATER"
+        CLOUDY_WITH_BRIEF_THUNDERSTORM = "CLOUDY_WITH_BRIEF_THUNDERSTORM"
+        CLOUDY_WITH_FOG_ON_THE_OCEAN_AND_AT_THE_SEASHORE = "CLOUDY_WITH_FOG_ON_THE_OCEAN_AND_AT_THE_SEASHORE"
+        CLOUDY_WITH_PERIODIC_RAIN = "CLOUDY_WITH_PERIODIC_RAIN"
+        CLOUDY_WITH_PERIODIC_RAIN_ACCOMPANIED_BY_THUNDER = "CLOUDY_WITH_PERIODIC_RAIN_ACCOMPANIED_BY_THUNDER"
+        CLOUDY_WITH_PERIODIC_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT = (
+            "CLOUDY_WITH_PERIODIC_RAIN_AND_SNOW_RAIN_AS_MAIN_CONSTITUENT"
+        )
+        CLOUDY_WITH_PERIODIC_RAIN_LATER = "CLOUDY_WITH_PERIODIC_RAIN_LATER"
+        CLOUDY_WITH_PERIODIC_SNOW = "CLOUDY_WITH_PERIODIC_SNOW"
+        CLOUDY_WITH_PERIODIC_SNOW_ACCOMPANIED_BY_THUNDER = "CLOUDY_WITH_PERIODIC_SNOW_ACCOMPANIED_BY_THUNDER"
+        CLOUDY_WITH_PERIODIC_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT = (
+            "CLOUDY_WITH_PERIODIC_SNOW_AND_RAIN_SNOW_AS_MAIN_CONSTITUENT"
+        )
+        CLOUDY_WITH_PERIODIC_SNOW_LATER = "CLOUDY_WITH_PERIODIC_SNOW_LATER"
+        CLOUDY_WITH_RAIN_AFTER_MIDNIGHT = "CLOUDY_WITH_RAIN_AFTER_MIDNIGHT"
+        CLOUDY_WITH_RAIN_FROM_ABOUT_NOON = "CLOUDY_WITH_RAIN_FROM_ABOUT_NOON"
+        CLOUDY_WITH_RAIN_FROM_EVENING = "CLOUDY_WITH_RAIN_FROM_EVENING"
+        CLOUDY_WITH_RAIN_LATER = "CLOUDY_WITH_RAIN_LATER"
+        CLOUDY_WITH_SNOW_FROM_AROUND_NOON = "CLOUDY_WITH_SNOW_FROM_AROUND_NOON"
+        CLOUDY_WITH_SNOW_LATER = "CLOUDY_WITH_SNOW_LATER"
+        FOG = "FOG"
+        RAINSNOW_MIX_LATER_BECOMING_CLEAR_RAIN_AS_MAIN = "RAINSNOW_MIX_LATER_BECOMING_CLEAR_RAIN_AS_MAIN"
+        RAINSNOW_MIX_RAIN_AS_MAIN = "RAINSNOW_MIX_RAIN_AS_MAIN"
+        RAINY_BUT_PERIODICALLY_CLEAR = "RAINY_BUT_PERIODICALLY_CLEAR"
+        RAIN_ACCOMPANIED_BY_LIGHTNING = "RAIN_ACCOMPANIED_BY_LIGHTNING"
+        RAIN_ACCOMPANIED_BY_WINDSTORM = "RAIN_ACCOMPANIED_BY_WINDSTORM"
+        RAIN_CLEAR_AT_NIGHT = "RAIN_CLEAR_AT_NIGHT"
+        RAIN_CLEAR_FROM_AROUND_EVENING = "RAIN_CLEAR_FROM_AROUND_EVENING"
+        RAIN_CLEAR_FROM_AROUND_NOON = "RAIN_CLEAR_FROM_AROUND_NOON"
+        RAIN_LATER_BECOMING_CLEAR = "RAIN_LATER_BECOMING_CLEAR"
+        RAIN_LATER_BECOMING_CLOUDY = "RAIN_LATER_BECOMING_CLOUDY"
+        RAIN_LATER_BECOMING_SNOW = "RAIN_LATER_BECOMING_SNOW"
+        RAIN_LATER_WITH_PERIODIC_SNOW = "RAIN_LATER_WITH_PERIODIC_SNOW"
+        RAIN_SNOW_AT_NIGHT = "RAIN_SNOW_AT_NIGHT"
+        RAIN_SNOW_IN_THE_EVENING = "RAIN_SNOW_IN_THE_EVENING"
+        RAIN_TEMPORARILY_BECOMING_SLEET = "RAIN_TEMPORARILY_BECOMING_SLEET"
+        RAIN_THAT_PERIODICALLY_STOPS = "RAIN_THAT_PERIODICALLY_STOPS"
+        RAIN_WITH_BRIEF_SNOW = "RAIN_WITH_BRIEF_SNOW"
+        RAIN_WITH_PERIODIC_SNOW = "RAIN_WITH_PERIODIC_SNOW"
+        SNOWRAIN_MIX_LATER_BECOMING_CLEAR_SNOW_AS_MAIN = "SNOWRAIN_MIX_LATER_BECOMING_CLEAR_SNOW_AS_MAIN"
+        SNOWRAIN_MIX_LATER_BECOMING_CLOUDY_SNOW_AS_MAIN = "SNOWRAIN_MIX_LATER_BECOMING_CLOUDY_SNOW_AS_MAIN"
+        SNOWRAIN_MIX_SNOW_AS_MAIN = "SNOWRAIN_MIX_SNOW_AS_MAIN"
+        SNOW_ACCOMPANIED_BY_LIGHTNING = "SNOW_ACCOMPANIED_BY_LIGHTNING"
+        SNOW_BECOMING_SLEET = "SNOW_BECOMING_SLEET"
+        SNOW_LATER_CLEAR = "SNOW_LATER_CLEAR"
+        SNOW_LATER_CLOUDY = "SNOW_LATER_CLOUDY"
+        SNOW_LATER_RAIN = "SNOW_LATER_RAIN"
+        SNOW_PERIODICALLY_CLEAR = "SNOW_PERIODICALLY_CLEAR"
+        SNOW_THAT_PERIODICALLY_STOPS = "SNOW_THAT_PERIODICALLY_STOPS"
+        SNOW_TURNING_TO_RAIN_AROUND_NOON = "SNOW_TURNING_TO_RAIN_AROUND_NOON"
+        SNOW_TURNING_TO_RAIN_IN_THE_EVENING = "SNOW_TURNING_TO_RAIN_IN_THE_EVENING"
+        SNOW_TURNING_TO_RAIN_IN_THE_NIGHT = "SNOW_TURNING_TO_RAIN_IN_THE_NIGHT"
+        SNOW_WITH_BRIEF_RAIN = "SNOW_WITH_BRIEF_RAIN"
+        SNOW_WITH_BRIEF_SLEET = "SNOW_WITH_BRIEF_SLEET"
+        SNOW_WITH_PERIODIC_RAIN = "SNOW_WITH_PERIODIC_RAIN"
+        VERY_HOT = "VERY_HOT"
+        SLEET = "SLEET"
+        HEAVY_RAIN_TO_RAINSTORM = "HEAVY_RAIN_TO_RAINSTORM"
 
     icon_base_uri: str = field(metadata={"alias": "iconBaseUri"})
     """The base URI for the icon not including the file type extension."""
@@ -312,10 +427,10 @@ class IceThickness(BaseModel):
         MILLIMETERS = "MILLIMETERS"
         INCHES = "INCHES"
 
-    thickness: float
+    thickness: float | None = None
     """The ice thickness value."""
 
-    unit: Unit
+    unit: Unit = Unit.UNIT_UNSPECIFIED
     """The code that represents the unit used to measure the ice thickness."""
 
 
@@ -334,6 +449,9 @@ class CurrentConditionsHistory(BaseModel):
 
     qpf: QuantitativePrecipitationForecast
     """The amount of precipitation (rain or snow) accumulated over the last 24 hours."""
+
+    snow_qpf: QuantitativePrecipitationForecast | None = field(default=None, metadata={"alias": "snowQpf"})
+    """The amount of snow accumulation over the last 24 hours, measured as liquid water equivalent."""
 
 
 @dataclass
@@ -388,11 +506,11 @@ class CurrentConditionsResponse(BaseModel):
     uv_index: int = field(metadata={"alias": "uvIndex"})
     """The current ultraviolet (UV) index."""
 
-    thunderstorm_probability: int = field(metadata={"alias": "thunderstormProbability"})
-    """The current thunderstorm probability (0-100)."""
+    thunderstorm_probability: int | None = field(default=None, metadata={"alias": "thunderstormProbability"})
+    """The current thunderstorm probability (0-100). Omitted in some regions (e.g. Japan and South Korea)."""
 
-    cloud_cover: int = field(metadata={"alias": "cloudCover"})
-    """The current percentage of the sky covered by clouds (0-100)."""
+    cloud_cover: int | None = field(default=None, metadata={"alias": "cloudCover"})
+    """The current percentage of the sky covered by clouds (0-100). Omitted in some regions (e.g. Japan and South Korea)."""
 
 
 @dataclass
@@ -411,7 +529,7 @@ class Date(BaseModel):
 
 @dataclass
 class ForecastDayPart(BaseModel):
-    """Represents a forecast record for a part of the day (daytime or nighttime)."""
+    """Represents a forecast record for a part of the day (daytime, nighttime, or full day)."""
 
     interval: Interval
     """The UTC date and time when this part of the day starts and ends."""
@@ -431,11 +549,11 @@ class ForecastDayPart(BaseModel):
     uv_index: int = field(metadata={"alias": "uvIndex"})
     """The maximum forecasted ultraviolet (UV) index."""
 
-    thunderstorm_probability: int = field(metadata={"alias": "thunderstormProbability"})
-    """The average thunderstorm probability."""
+    thunderstorm_probability: int | None = field(default=None, metadata={"alias": "thunderstormProbability"})
+    """The average thunderstorm probability. Omitted in some regions (e.g. Japan and South Korea)."""
 
-    cloud_cover: int = field(metadata={"alias": "cloudCover"})
-    """Average cloud cover percent."""
+    cloud_cover: int | None = field(default=None, metadata={"alias": "cloudCover"})
+    """Average cloud cover percent. Omitted in some regions (e.g. Japan and South Korea)."""
 
     ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The forecasted ice thickness."""
@@ -459,7 +577,7 @@ class MoonEvents(BaseModel):
     class MoonPhase(ApiStrEnum):
         """Marks the moon phase (a.k.a. lunar phase)."""
 
-        MOON_PHASE_UNSPECIFIED = "MOON_PHASE_UNSPECIFIED"
+        PHASE_UNSPECIFIED = "PHASE_UNSPECIFIED"
         NEW_MOON = "NEW_MOON"
         WAXING_CRESCENT = "WAXING_CRESCENT"
         FIRST_QUARTER = "FIRST_QUARTER"
@@ -489,12 +607,6 @@ class ForecastDay(BaseModel):
     display_date: Date = field(metadata={"alias": "displayDate"})
     """The local date in the time zone of the location."""
 
-    daytime_forecast: ForecastDayPart = field(metadata={"alias": "daytimeForecast"})
-    """The forecasted weather conditions for the daytime part of the day."""
-
-    nighttime_forecast: ForecastDayPart = field(metadata={"alias": "nighttimeForecast"})
-    """The forecasted weather conditions for the nighttime part of the day."""
-
     max_temperature: Temperature = field(metadata={"alias": "maxTemperature"})
     """The maximum (high) temperature throughout the day."""
 
@@ -515,6 +627,15 @@ class ForecastDay(BaseModel):
 
     moon_events: MoonEvents = field(metadata={"alias": "moonEvents"})
     """The events related to the moon (e.g. moonrise, moonset)."""
+
+    daytime_forecast: ForecastDayPart | None = field(default=None, metadata={"alias": "daytimeForecast"})
+    """The forecasted weather conditions for the daytime part of the day."""
+
+    nighttime_forecast: ForecastDayPart | None = field(default=None, metadata={"alias": "nighttimeForecast"})
+    """The forecasted weather conditions for the nighttime part of the day."""
+
+    full_day_forecast: ForecastDayPart | None = field(default=None, metadata={"alias": "fullDayForecast"})
+    """The forecasted weather conditions for the full day (returned instead of daytime/nighttime in Japan and South Korea)."""
 
     ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The accumulated amount of ice throughout the entire day."""
@@ -618,11 +739,11 @@ class ForecastHour(BaseModel):
     uv_index: int = field(metadata={"alias": "uvIndex"})
     """The forecasted ultraviolet (UV) index."""
 
-    thunderstorm_probability: int = field(metadata={"alias": "thunderstormProbability"})
-    """The forecasted thunderstorm probability (0-100)."""
+    thunderstorm_probability: int | None = field(default=None, metadata={"alias": "thunderstormProbability"})
+    """The forecasted thunderstorm probability (0-100). Omitted in some regions (e.g. Japan and South Korea)."""
 
-    cloud_cover: int = field(metadata={"alias": "cloudCover"})
-    """The forecasted percentage of the sky covered by clouds (0-100)."""
+    cloud_cover: int | None = field(default=None, metadata={"alias": "cloudCover"})
+    """The forecasted percentage of the sky covered by clouds (0-100). Omitted in some regions (e.g. Japan and South Korea)."""
 
     ice_thickness: IceThickness | None = field(default=None, metadata={"alias": "iceThickness"})
     """The forecasted ice thickness."""

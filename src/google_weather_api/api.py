@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import logging
 from http import HTTPStatus
-from typing import Any
+from typing import Any, TypeVar
 
 import aiohttp
+from mashumaro.exceptions import InvalidFieldValue, MissingField
 
 from .exceptions import (
     GoogleWeatherApiAuthError,
@@ -15,6 +16,7 @@ from .exceptions import (
     GoogleWeatherApiResponseError,
 )
 from .model import (
+    BaseModel,
     CurrentConditionsResponse,
     DailyForecastResponse,
     HourlyForecastResponse,
@@ -22,6 +24,17 @@ from .model import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+_ResponseT = TypeVar("_ResponseT", bound=BaseModel)
+
+
+def _parse_response(model: type[_ResponseT], data: dict[str, Any]) -> _ResponseT:
+    """Deserialize an API response dictionary, wrapping schema errors."""
+    try:
+        return model.from_dict(data)
+    except (InvalidFieldValue, MissingField) as err:
+        raise GoogleWeatherApiResponseError(str(err)) from err
+
 
 _BASE_URL = "https://weather.googleapis.com/v1"
 # See https://docs.cloud.google.com/docs/authentication/api-keys-use
@@ -140,7 +153,7 @@ class GoogleWeatherApi:
                 "location.longitude": longitude,
             },
         )
-        return CurrentConditionsResponse.from_dict(data)
+        return _parse_response(CurrentConditionsResponse, data)
 
     async def async_get_hourly_forecast(self, latitude: float, longitude: float, hours: int = 48) -> HourlyForecastResponse:
         """Fetch hourly weather forecast.
@@ -157,7 +170,7 @@ class GoogleWeatherApi:
             "forecastHours",
             hours,
         )
-        return HourlyForecastResponse.from_dict(data)
+        return _parse_response(HourlyForecastResponse, data)
 
     async def async_get_daily_forecast(self, latitude: float, longitude: float, days: int = 10) -> DailyForecastResponse:
         """Fetch daily weather forecast.
@@ -174,7 +187,7 @@ class GoogleWeatherApi:
             "forecastDays",
             days,
         )
-        return DailyForecastResponse.from_dict(data)
+        return _parse_response(DailyForecastResponse, data)
 
     async def async_get_minute_forecast(
         self, latitude: float, longitude: float, page_size: int = 360
@@ -197,4 +210,4 @@ class GoogleWeatherApi:
             page_size,
             include_language_code=False,
         )
-        return MinuteForecastResponse.from_dict(data)
+        return _parse_response(MinuteForecastResponse, data)

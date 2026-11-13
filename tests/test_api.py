@@ -94,8 +94,12 @@ async def test_get_daily_forecast(api: GoogleWeatherApi, mock_server: MockServer
 
     assert len(result.forecast_days) == 2
     day = result.forecast_days[0]
+    assert day.max_temperature.degrees is not None
+    assert day.min_temperature.degrees is not None
     assert day.max_temperature.degrees >= day.min_temperature.degrees
+    assert day.daytime_forecast is not None
     assert day.daytime_forecast.weather_condition.type
+    assert day.nighttime_forecast is not None
     assert day.nighttime_forecast.weather_condition.type
     assert day.sun_events.sunrise_time
     assert day.moon_events.moon_phase
@@ -332,6 +336,14 @@ async def test_get_minute_forecast(api: GoogleWeatherApi, mock_server: MockServe
     assert "language_code" not in request.query
 
 
+async def test_malformed_response_raises_response_error(api: GoogleWeatherApi, mock_server: MockServer) -> None:
+    """Test a 200 OK response missing required schema fields raises GoogleWeatherApiResponseError."""
+    mock_server.add_response({})
+
+    with pytest.raises(GoogleWeatherApiResponseError):
+        await api.async_get_current_conditions(LATITUDE, LONGITUDE)
+
+
 def _load_dotenv() -> dict[str, str]:
     """Load credentials from .env or environment variables."""
     env: dict[str, str] = {}
@@ -372,3 +384,19 @@ async def test_live_weather_endpoints(session: aiohttp.ClientSession) -> None:
 
     minute = await client.async_get_minute_forecast(LATITUDE, LONGITUDE, page_size=10)
     assert minute.time_zone.id
+
+    # Japan (Tokyo) and South Korea (Seoul) use fullDayForecast and omit several fields.
+    for lat, lon, expected_tz in (
+        (35.6762, 139.6503, "Asia/Tokyo"),
+        (37.5665, 126.9780, "Asia/Seoul"),
+    ):
+        regional_current = await client.async_get_current_conditions(lat, lon)
+        assert regional_current.time_zone.id == expected_tz
+        assert regional_current.temperature.degrees is not None
+
+        regional_daily = await client.async_get_daily_forecast(lat, lon, days=2)
+        assert len(regional_daily.forecast_days) == 2
+        assert regional_daily.forecast_days[0].full_day_forecast is not None
+
+        regional_hourly = await client.async_get_hourly_forecast(lat, lon, hours=2)
+        assert len(regional_hourly.forecast_hours) == 2
